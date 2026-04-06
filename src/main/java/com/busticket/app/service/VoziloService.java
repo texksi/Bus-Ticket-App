@@ -1,9 +1,9 @@
 package com.busticket.app.service;
 
 import com.busticket.app.exceptions.EntityAlreadyExistsException;
+import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.model.entity.Vozilo;
 import com.busticket.app.repository.VoziloRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ public class VoziloService {
     private final VoziloRepository voziloRepository;
 
     public Vozilo getVoziloById(Long id) {
-        return voziloRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return voziloRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vozilo nije pronadjeno"));
     }
 
     public List<Vozilo> getAllVozilaForKompanija(Long kompanijaId) {

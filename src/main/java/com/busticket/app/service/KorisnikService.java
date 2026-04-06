@@ -1,9 +1,9 @@
 package com.busticket.app.service;
 
 import com.busticket.app.exceptions.EntityAlreadyExistsException;
+import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.model.entity.Korisnik;
 import com.busticket.app.repository.KorisnikRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +16,11 @@ public class KorisnikService {
     private final KorisnikRepository korisnikRepository;
 
     public Korisnik getKorisnikById(Long id){
-        return korisnikRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return korisnikRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Korisnik ne postoji"));
     }
 
     public Korisnik getKorisnikByUsername(String username){
-        return korisnikRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
+        return korisnikRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("Korisnik ne postoji"));
     }
 
     public List<Korisnik> getAllKorisnici(){
