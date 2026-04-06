@@ -1,8 +1,8 @@
 package com.busticket.app.service;
 
+import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.model.entity.Putovanje;
 import com.busticket.app.repository.PutovanjeRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ public class PutovanjeService {
     private final PutovanjeRepository putovanjeRepository;
 
     public Putovanje getPutovanjeById(Long id){
-        return putovanjeRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return putovanjeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Putovanje nije pronadjeno"));
     }
 
     public List<Putovanje> getAllPutovanja(){

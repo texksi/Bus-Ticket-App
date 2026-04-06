@@ -1,8 +1,8 @@
 package com.busticket.app.service;
 
+import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.model.entity.Karta;
 import com.busticket.app.repository.KartaRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ public class KartaService {
     private final KartaRepository kartaRepository;
 
     public Karta getKartaById(Long id){
-        return kartaRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return kartaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Karta nije pronađena"));
     }
 
     public List<Karta> getAllKarte(){

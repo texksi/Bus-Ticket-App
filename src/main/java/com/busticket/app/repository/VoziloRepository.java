@@ -11,5 +11,4 @@ public interface VoziloRepository extends JpaRepository<Vozilo,Long> {
 
     List<Vozilo> findAllByKompanijaId(Long kompanijaId);
     boolean existsByRegistracija(String registracija);
-    Vozilo findByPutovanjeId(Long id);
 }
