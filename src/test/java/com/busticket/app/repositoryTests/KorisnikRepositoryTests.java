@@ -75,7 +75,7 @@ public class KorisnikRepositoryTests {
     }
 
     @Test
-    public void deleteKorisnik(){
+    public void deleteKorisnikTest(){
         Korisnik saved = korisnikRepository.save(builderKorisnik());
         korisnikRepository.deleteById(saved.getId());
         boolean exists = korisnikRepository.existsById(saved.getId());
