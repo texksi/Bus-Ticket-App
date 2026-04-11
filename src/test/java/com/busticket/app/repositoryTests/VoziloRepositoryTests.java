@@ -78,4 +78,11 @@ public class VoziloRepositoryTests {
         boolean exists = voziloRepository.existsById(saved.getId());
         Assertions.assertThat(exists).isFalse();
     }
+
+    @Test
+    public void existsByRegistracijaTest(){
+        voziloRepository.save(builderVozilo());
+        boolean exists = voziloRepository.existsByRegistracija("bg334");
+        Assertions.assertThat(exists).isTrue();
+    }
 }
