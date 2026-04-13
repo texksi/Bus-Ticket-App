@@ -2,7 +2,12 @@ package com.busticket.app.service;
 
 import com.busticket.app.exceptions.EntityAlreadyExistsException;
 import com.busticket.app.exceptions.EntityNotFoundException;
+import com.busticket.app.mapper.VoziloMapper;
+import com.busticket.app.model.dto.RequestDTOs.VoziloRequestDTO;
+import com.busticket.app.model.dto.ResponseDTOs.VoziloResponseDTO;
+import com.busticket.app.model.entity.Kompanija;
 import com.busticket.app.model.entity.Vozilo;
+import com.busticket.app.repository.KompanijaRepository;
 import com.busticket.app.repository.VoziloRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,29 +19,43 @@ import java.util.List;
 public class VoziloService {
 
     private final VoziloRepository voziloRepository;
+    private final VoziloMapper voziloMapper;
+    private final KompanijaRepository kompanijaRepository;
 
-    public Vozilo getVoziloById(Long id) {
-        return voziloRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vozilo nije pronadjeno"));
+    public VoziloResponseDTO getVoziloById(Long id) {
+        Vozilo vozilo = voziloRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Vozilo nije pronadjeno"));
+        return voziloMapper.toResponse(vozilo);
     }
 
-    public List<Vozilo> getAllVozilaForKompanija(Long kompanijaId) {
-        return voziloRepository.findAllByKompanijaId(kompanijaId);
+    public List<VoziloResponseDTO> getAllVozilaForKompanija(Long kompanijaId) {
+        List<Vozilo> vozila = voziloRepository.findAllByKompanijaId(kompanijaId);
+        return vozila.stream().map(voziloMapper::toResponse).toList();
     }
 
-    public Vozilo createVozilo(Vozilo vozilo) {
-        if (voziloRepository.existsByRegistracija(vozilo.getRegistracija())) {
+    public VoziloResponseDTO createVozilo(VoziloRequestDTO newVozilo) {
+        if (voziloRepository.existsByRegistracija(newVozilo.getRegistracija())) {
             throw new EntityAlreadyExistsException("Vozilo sa ovom registracijom vec postoji");
         }
-        return voziloRepository.save(vozilo);
+        Vozilo vozilo = voziloMapper.toEntity(newVozilo);
+        Kompanija kompanija = kompanijaRepository.findById(newVozilo.getKompanijaId()).orElseThrow(
+                () -> new EntityNotFoundException("Kompanija nije pronadjena")
+        );
+        vozilo.setKompanija(kompanija);
+        Vozilo saved = voziloRepository.save(vozilo);
+        return voziloMapper.toResponse(saved);
     }
 
-    public Vozilo updateVozilo(Long id, int kapacitet, String registracija, int brojRedova, int brojKolona) {
-        Vozilo savedVozilo = getVoziloById(id);
+    public VoziloResponseDTO updateVozilo(Long id, int kapacitet, String registracija, int brojRedova, int brojKolona) {
+        Vozilo savedVozilo = voziloRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Vozilo nije pronadjeno")
+        );
         savedVozilo.setKapacitet(kapacitet);
         savedVozilo.setRegistracija(registracija);
         savedVozilo.setBrojKolona(brojKolona);
         savedVozilo.setBrojRedova(brojRedova);
-        return voziloRepository.save(savedVozilo);
+        Vozilo vozilo = voziloRepository.save(savedVozilo);
+        return voziloMapper.toResponse(vozilo);
     }
 
     public void deleteVozilo(Long id) {
