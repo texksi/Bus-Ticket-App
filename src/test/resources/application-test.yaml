@@ -11,3 +11,5 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
+stripe:
+  secret-key: sk_test_dummy_key_for_tests
