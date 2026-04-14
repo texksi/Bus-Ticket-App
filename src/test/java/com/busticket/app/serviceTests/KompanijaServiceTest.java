@@ -1,5 +1,8 @@
 package com.busticket.app.serviceTests;
 
+import com.busticket.app.mapper.KompanijaMapper;
+import com.busticket.app.model.dto.RequestDTOs.KompanijaRequestDTO;
+import com.busticket.app.model.dto.ResponseDTOs.KompanijaResponseDTO;
 import com.busticket.app.model.entity.Kompanija;
 import com.busticket.app.repository.KompanijaRepository;
 import com.busticket.app.service.KompanijaService;
@@ -21,6 +24,8 @@ public class KompanijaServiceTest {
 
     @Mock
     private KompanijaRepository kompanijaRepository;
+    @Mock
+    private KompanijaMapper kompanijaMapper;
     @InjectMocks
     private KompanijaService kompanijaService;
 
@@ -35,7 +40,8 @@ public class KompanijaServiceTest {
     public void getKompanijaById_Success(){
         Kompanija kompanija = builderKompanija();
         when(kompanijaRepository.findById(1L)).thenReturn(Optional.of(kompanija));
-        Kompanija found = kompanijaService.getKompanijaById(1L);
+        when(kompanijaMapper.toResponse(kompanija)).thenReturn(new KompanijaResponseDTO());
+        KompanijaResponseDTO found = kompanijaService.getKompanijaById(1L);
         Assertions.assertThat(found).isNotNull();
     }
 
@@ -43,15 +49,22 @@ public class KompanijaServiceTest {
     public void getAllKompanije_Success(){
         Kompanija kompanija = builderKompanija();
         when(kompanijaRepository.findAll()).thenReturn(List.of(kompanija));
-        List<Kompanija> all = kompanijaService.getAllKompanije();
+        when(kompanijaMapper.toResponse(kompanija)).thenReturn(new KompanijaResponseDTO());
+        List<KompanijaResponseDTO> all = kompanijaService.getAllKompanije();
         Assertions.assertThat(all).hasSize(1);
     }
 
     @Test
     public void createKompanija_Success(){
+        KompanijaRequestDTO kompanijaRequestDTO = KompanijaRequestDTO.builder()
+                .naziv("kompanija")
+                .kontakt("kontakt@email.com")
+                .build();
         Kompanija kompanija = builderKompanija();
+        when(kompanijaMapper.toEntity(kompanijaRequestDTO)).thenReturn(kompanija);
         when(kompanijaRepository.save(kompanija)).thenReturn(kompanija);
-        Kompanija saved = kompanijaService.createKompanija(kompanija);
+        when(kompanijaMapper.toResponse(kompanija)).thenReturn(new KompanijaResponseDTO());
+        KompanijaResponseDTO saved = kompanijaService.createKompanija(kompanijaRequestDTO);
         Assertions.assertThat(saved).isNotNull();
     }
 
@@ -60,7 +73,8 @@ public class KompanijaServiceTest {
         Kompanija kompanija = builderKompanija();
         when(kompanijaRepository.findById(1L)).thenReturn(Optional.of(kompanija));
         when(kompanijaRepository.save(kompanija)).thenReturn(kompanija);
-        Kompanija updated = kompanijaService.updateKompanija(1L,"novi naziv","kontakt@email.com");
+        when(kompanijaMapper.toResponse(kompanija)).thenReturn(new KompanijaResponseDTO());
+        KompanijaResponseDTO updated = kompanijaService.updateKompanija(1L,"novi naziv","kontakt@email.com");
         Assertions.assertThat(updated).isNotNull();
     }
 

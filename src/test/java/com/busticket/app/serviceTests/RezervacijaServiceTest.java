@@ -1,8 +1,12 @@
 package com.busticket.app.serviceTests;
 
+import com.busticket.app.mapper.RezervacijaMapper;
+import com.busticket.app.model.dto.RequestDTOs.RezervacijaRequestDTO;
+import com.busticket.app.model.dto.ResponseDTOs.RezervacijaResponseDTO;
 import com.busticket.app.model.entity.Korisnik;
 import com.busticket.app.model.entity.Rezervacija;
 import com.busticket.app.model.entity.enums.Role;
+import com.busticket.app.repository.KorisnikRepository;
 import com.busticket.app.repository.RezervacijaRepository;
 import com.busticket.app.service.RezervacijaService;
 import org.assertj.core.api.Assertions;
@@ -25,6 +29,10 @@ public class RezervacijaServiceTest {
 
     @Mock
     private RezervacijaRepository rezervacijaRepository;
+    @Mock
+    private RezervacijaMapper rezervacijaMapper;
+    @Mock
+    private KorisnikRepository korisnikRepository;
     @InjectMocks
     private RezervacijaService rezervacijaService;
     private Korisnik savedKorisnik;
@@ -54,7 +62,8 @@ public class RezervacijaServiceTest {
     public void getRezervacijaById_Success(){
         Rezervacija rezervacija = builderRezervacija();
         when(rezervacijaRepository.findById(1L)).thenReturn(Optional.of(rezervacija));
-        Rezervacija found = rezervacijaService.getRezervacijaById(1L);
+        when(rezervacijaMapper.toResponse(rezervacija)).thenReturn(new RezervacijaResponseDTO());
+        RezervacijaResponseDTO found = rezervacijaService.getRezervacijaById(1L);
         Assertions.assertThat(found).isNotNull();
     }
 
@@ -62,15 +71,25 @@ public class RezervacijaServiceTest {
     public void getAllRezervacije_Success(){
         Rezervacija rezervacija = builderRezervacija();
         when(rezervacijaRepository.findAll()).thenReturn(List.of(rezervacija));
-        List<Rezervacija> all = rezervacijaService.getAllRezervacije();
+        when(rezervacijaMapper.toResponse(rezervacija)).thenReturn(new RezervacijaResponseDTO());
+        List<RezervacijaResponseDTO> all = rezervacijaService.getAllRezervacije();
         Assertions.assertThat(all).hasSize(1);
     }
 
     @Test
     public void createRezervacija_Success(){
+        RezervacijaRequestDTO rezervacijaRequestDTO = RezervacijaRequestDTO.builder()
+                .ukupanIznos(100)
+                .nacinPlacanja("Kartica")
+                .status("pending")
+                .korisnikId(1L)
+                .build();
         Rezervacija rezervacija = builderRezervacija();
+        when(rezervacijaMapper.toEntity(rezervacijaRequestDTO)).thenReturn(rezervacija);
+        when(korisnikRepository.findById(1L)).thenReturn(Optional.of(savedKorisnik));
         when(rezervacijaRepository.save(rezervacija)).thenReturn(rezervacija);
-        Rezervacija saved = rezervacijaService.createRezervacija(rezervacija);
+        when(rezervacijaMapper.toResponse(rezervacija)).thenReturn(new RezervacijaResponseDTO());
+        RezervacijaResponseDTO saved = rezervacijaService.createRezervacija(rezervacijaRequestDTO);
         Assertions.assertThat(saved).isNotNull();
     }
 
@@ -79,7 +98,8 @@ public class RezervacijaServiceTest {
         Rezervacija rezervacija = builderRezervacija();
         when(rezervacijaRepository.findById(1L)).thenReturn(Optional.of(rezervacija));
         when(rezervacijaRepository.save(rezervacija)).thenReturn(rezervacija);
-        Rezervacija updated = rezervacijaService.updateRezervacija(1L,"novi status","gotovina",100);
+        when(rezervacijaMapper.toResponse(rezervacija)).thenReturn(new RezervacijaResponseDTO());
+        RezervacijaResponseDTO updated = rezervacijaService.updateRezervacija(1L,"novi status","gotovina",100);
         Assertions.assertThat(updated).isNotNull();
     }
 
@@ -94,7 +114,8 @@ public class RezervacijaServiceTest {
     public void getRezervacijeByKorisnik_Success(){
         Rezervacija rezervacija = builderRezervacija();
         when(rezervacijaRepository.findAllByKorisnikId(rezervacija.getKorisnik().getId())).thenReturn(List.of(rezervacija));
-        List<Rezervacija> all = rezervacijaService.getRezervacijeByKorisnik(rezervacija.getKorisnik().getId());
+        when(rezervacijaMapper.toResponse(rezervacija)).thenReturn(new RezervacijaResponseDTO());
+        List<RezervacijaResponseDTO> all = rezervacijaService.getRezervacijeByKorisnik(rezervacija.getKorisnik().getId());
         Assertions.assertThat(all).hasSize(1);
     }
 }
