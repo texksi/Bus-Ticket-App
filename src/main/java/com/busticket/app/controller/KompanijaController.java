@@ -1,12 +1,14 @@
 package com.busticket.app.controller;
 
-import com.busticket.app.model.entity.Kompanija;
-import com.busticket.app.model.entity.Putovanje;
-import com.busticket.app.model.entity.Vozilo;
+import com.busticket.app.model.dto.RequestDTOs.KompanijaRequestDTO;
+import com.busticket.app.model.dto.ResponseDTOs.KompanijaResponseDTO;
+import com.busticket.app.model.dto.ResponseDTOs.PutovanjeResponseDTO;
+import com.busticket.app.model.dto.ResponseDTOs.VoziloResponseDTO;
 import com.busticket.app.service.KompanijaService;
 import com.busticket.app.service.PutovanjeService;
 import com.busticket.app.service.VoziloService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,38 +22,40 @@ public class KompanijaController {
     private final VoziloService voziloService;
 
     @GetMapping("/api/kompanije")
-    public List<Kompanija> getAllKompanije() {
-        return kompanijaService.getAllKompanije();
+    public ResponseEntity<List<KompanijaResponseDTO>> getAllKompanije() {
+        return ResponseEntity.ok(kompanijaService.getAllKompanije());
     }
 
     @GetMapping("/api/kompanije/{id}")
-    public Kompanija getKompanijaById(@PathVariable Long id) {
-        return kompanijaService.getKompanijaById(id);
+    public ResponseEntity<KompanijaResponseDTO> getKompanijaById(@PathVariable Long id) {
+        return ResponseEntity.ok(kompanijaService.getKompanijaById(id));
     }
 
     @GetMapping("/api/kompanije/{id}/putovanja")
-    public List<Putovanje> getPutovanjaByKompanija(@PathVariable Long id) {
-        return putovanjeService.getPutovanjaByKompanija(id);
+    public ResponseEntity<List<PutovanjeResponseDTO>> getPutovanjaByKompanija(@PathVariable Long id) {
+        return ResponseEntity.ok(putovanjeService.getPutovanjaByKompanija(id));
     }
 
     @GetMapping("/api/kompanije/{id}/vozila")
-    public List<Vozilo> getVozilaByKompanija(@PathVariable Long id) {
-        return voziloService.getAllVozilaForKompanija(id);
+    public ResponseEntity<List<VoziloResponseDTO>> getVozilaByKompanija(@PathVariable Long id) {
+        return ResponseEntity.ok(voziloService.getAllVozilaForKompanija(id));
     }
 
     @PostMapping("/api/kompanije")
-    public Kompanija createKompanija(@RequestBody Kompanija kompanija) {
-        return kompanijaService.createKompanija(kompanija);
+    public ResponseEntity<KompanijaResponseDTO> createKompanija(@RequestBody KompanijaRequestDTO kompanija) {
+        return ResponseEntity.status(201).body(kompanijaService.createKompanija(kompanija));
     }
 
     @PutMapping("/api/kompanije/{id}")
-    public Kompanija updateKompanija(@RequestBody Kompanija kompanija, @PathVariable Long id) {
-        return kompanijaService.updateKompanija(id, kompanija.getNaziv(), kompanija.getKontakt());
+    public ResponseEntity<KompanijaResponseDTO> updateKompanija(@RequestBody KompanijaRequestDTO kompanija,
+                                                                @PathVariable Long id) {
+        return ResponseEntity.ok(kompanijaService.updateKompanija(id, kompanija.getNaziv(), kompanija.getKontakt()));
     }
 
     @DeleteMapping("/api/kompanije/{id}")
-    public void deleteKompanija(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteKompanija(@PathVariable Long id) {
         kompanijaService.deleteKompanija(id);
+        return ResponseEntity.noContent().build();
     }
 
 
