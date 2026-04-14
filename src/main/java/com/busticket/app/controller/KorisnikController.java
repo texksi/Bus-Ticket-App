@@ -1,12 +1,14 @@
 package com.busticket.app.controller;
 
-import com.busticket.app.model.entity.Korisnik;
-import com.busticket.app.model.entity.Ocena;
-import com.busticket.app.model.entity.Rezervacija;
+import com.busticket.app.model.dto.RequestDTOs.KorisnikRequestDTO;
+import com.busticket.app.model.dto.ResponseDTOs.KorisnikResponseDTO;
+import com.busticket.app.model.dto.ResponseDTOs.OcenaResponseDTO;
+import com.busticket.app.model.dto.ResponseDTOs.RezervacijaResponseDTO;
 import com.busticket.app.service.KorisnikService;
 import com.busticket.app.service.OcenaService;
 import com.busticket.app.service.RezervacijaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,39 +22,40 @@ public class KorisnikController {
     private final OcenaService ocenaService;
 
     @GetMapping("/api/korisnici")
-    public List<Korisnik> getAllKorisnici(){
-        return  korisnikService.getAllKorisnici();
+    public ResponseEntity<List<KorisnikResponseDTO>> getAllKorisnici(){
+        return ResponseEntity.ok(korisnikService.getAllKorisnici());
     }
 
     @GetMapping("/api/korisnici/{id}")
-    public Korisnik getKorisnik(@PathVariable Long id){
-        return  korisnikService.getKorisnikById(id);
+    public ResponseEntity<KorisnikResponseDTO> getKorisnik(@PathVariable Long id){
+        return  ResponseEntity.ok(korisnikService.getKorisnikById(id));
     }
 
     @GetMapping("/api/korisnici/{id}/rezervacije")
-    public List<Rezervacija> getAllRezervacijeByKorisnik(@PathVariable  Long id){
-        return rezervacijaService.getRezervacijeByKorisnik(id);
+    public ResponseEntity<List<RezervacijaResponseDTO>> getAllRezervacijeByKorisnik(@PathVariable  Long id){
+        return ResponseEntity.ok(rezervacijaService.getRezervacijeByKorisnik(id));
     }
 
     @GetMapping("/api/korisnici/{id}/ocene")
-    public List<Ocena> getAllOceneByKorisnik(@PathVariable Long id){
-        return ocenaService.getOceneByKorisnik(id);
+    public ResponseEntity<List<OcenaResponseDTO>> getAllOceneByKorisnik(@PathVariable Long id){
+        return ResponseEntity.ok(ocenaService.getOceneByKorisnik(id));
     }
 
     @PostMapping("/api/korisnici")
-    public Korisnik createKorisnik(@RequestBody  Korisnik korisnik){
-        return  korisnikService.createKorisnik(korisnik);
+    public ResponseEntity<KorisnikResponseDTO> createKorisnik(@RequestBody KorisnikRequestDTO korisnik){
+        return ResponseEntity.status(201).body(korisnikService.createKorisnik(korisnik));
     }
 
     @PutMapping("/api/korisnici/{id}")
-    public Korisnik updateKorisnik(@PathVariable Long id, @RequestBody Korisnik korisnik){
-        return korisnikService.updateKorisnik(id, korisnik.getUsername(),
-                korisnik.getEmail(), korisnik.getIme(), korisnik.getPrezime());
+    public ResponseEntity<KorisnikResponseDTO> updateKorisnik(@PathVariable Long id, @RequestBody KorisnikRequestDTO korisnik){
+        return ResponseEntity.ok(korisnikService.updateKorisnik(id, korisnik.getUsername(),
+                korisnik.getEmail(), korisnik.getIme(), korisnik.getPrezime()));
     }
 
     @DeleteMapping("/api/korisnici/{id}")
-    public void deleteKorisnik(@PathVariable Long id){
+    public ResponseEntity<Void> deleteKorisnik(@PathVariable Long id){
         korisnikService.deleteKorisnik(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

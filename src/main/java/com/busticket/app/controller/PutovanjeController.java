@@ -1,10 +1,12 @@
 package com.busticket.app.controller;
 
-import com.busticket.app.model.entity.Ocena;
-import com.busticket.app.model.entity.Putovanje;
+import com.busticket.app.model.dto.RequestDTOs.PutovanjeRequestDTO;
+import com.busticket.app.model.dto.ResponseDTOs.OcenaResponseDTO;
+import com.busticket.app.model.dto.ResponseDTOs.PutovanjeResponseDTO;
 import com.busticket.app.service.OcenaService;
 import com.busticket.app.service.PutovanjeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,34 +19,37 @@ public class PutovanjeController {
     private final OcenaService ocenaService;
 
     @GetMapping("/api/putovanja")
-    public List<Putovanje> getAllPutovanja() {
-        return putovanjeService.getAllPutovanja();
+    public ResponseEntity<List<PutovanjeResponseDTO>> getAllPutovanja() {
+        return ResponseEntity.ok(putovanjeService.getAllPutovanja());
     }
 
     @GetMapping("/api/putovanja/{id}")
-    public Putovanje getPutovanje(@PathVariable Long id) {
-        return putovanjeService.getPutovanjeById(id);
+    public ResponseEntity<PutovanjeResponseDTO> getPutovanje(@PathVariable Long id) {
+        return ResponseEntity.ok(putovanjeService.getPutovanjeById(id));
     }
 
     @GetMapping("/api/putovanja/{id}/ocene")
-    public List<Ocena> getOceneForPutovanje(@PathVariable Long id) {
-        return ocenaService.getOceneForPutovanje(id);
+    public ResponseEntity<List<OcenaResponseDTO>> getOceneForPutovanje(@PathVariable Long id) {
+        return ResponseEntity.ok(ocenaService.getOceneForPutovanje(id));
     }
 
     @PostMapping("/api/putovanja")
-    public Putovanje createPutovanje(@RequestBody Putovanje putovanje) {
-        return putovanjeService.createPutovanje(putovanje);
+    public ResponseEntity<PutovanjeResponseDTO> createPutovanje(@RequestBody PutovanjeRequestDTO putovanje) {
+        return ResponseEntity.status(201).body(putovanjeService.createPutovanje(putovanje));
     }
 
     @PutMapping("/api/putovanja/{id}")
-    public Putovanje updatePutovanje(@RequestBody Putovanje putovanje, @PathVariable Long id) {
-        return putovanjeService.updatePutovanje(id, putovanje.getPolaziste(), putovanje.getOdrediste(),
-                putovanje.getVremePolaska(), putovanje.getVremeDolaska(), putovanje.getOsnovnaCena());
+    public ResponseEntity<PutovanjeResponseDTO> updatePutovanje(@RequestBody PutovanjeRequestDTO putovanje,
+                                                                @PathVariable Long id) {
+        return ResponseEntity.ok(putovanjeService.updatePutovanje(id, putovanje.getPolaziste(),
+                putovanje.getOdrediste(), putovanje.getVremePolaska(), putovanje.getVremeDolaska(),
+                putovanje.getOsnovnaCena()));
     }
 
     @DeleteMapping("/api/putovanja/{id}")
-    public void deletePutovanje(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePutovanje(@PathVariable Long id) {
         putovanjeService.deletePutovanje(id);
+        return ResponseEntity.noContent().build();
     }
 
 
