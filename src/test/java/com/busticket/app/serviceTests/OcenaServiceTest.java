@@ -1,11 +1,16 @@
 package com.busticket.app.serviceTests;
 
 import com.busticket.app.exceptions.EntityAlreadyExistsException;
+import com.busticket.app.mapper.OcenaMapper;
+import com.busticket.app.model.dto.RequestDTOs.OcenaRequestDTO;
+import com.busticket.app.model.dto.ResponseDTOs.OcenaResponseDTO;
 import com.busticket.app.model.entity.Korisnik;
 import com.busticket.app.model.entity.Ocena;
 import com.busticket.app.model.entity.Putovanje;
 import com.busticket.app.model.entity.enums.Role;
+import com.busticket.app.repository.KorisnikRepository;
 import com.busticket.app.repository.OcenaRepository;
+import com.busticket.app.repository.PutovanjeRepository;
 import com.busticket.app.service.OcenaService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,6 +32,12 @@ public class OcenaServiceTest {
 
     @Mock
     private OcenaRepository ocenaRepository;
+    @Mock
+    private OcenaMapper ocenaMapper;
+    @Mock
+    private KorisnikRepository korisnikRepository;
+    @Mock
+    private PutovanjeRepository putovanjeRepository;
     @InjectMocks
     private OcenaService ocenaService;
 
@@ -66,7 +78,8 @@ public class OcenaServiceTest {
     public void getOceneByKorisnik_Success(){
         Ocena ocena = builderOcena();
         when(ocenaRepository.findAllByKorisnikId(ocena.getKorisnik().getId())).thenReturn(List.of(ocena));
-        List<Ocena> all = ocenaService.getOceneByKorisnik(ocena.getKorisnik().getId());
+        when(ocenaMapper.toResponse(ocena)).thenReturn(new OcenaResponseDTO());
+        List<OcenaResponseDTO> all = ocenaService.getOceneByKorisnik(ocena.getKorisnik().getId());
         Assertions.assertThat(all).hasSize(1);
     }
 
@@ -74,24 +87,40 @@ public class OcenaServiceTest {
     public void getOceneForPutovanje_Success(){
         Ocena ocena = builderOcena();
         when(ocenaRepository.findAllByPutovanjeId(ocena.getPutovanje().getId())).thenReturn(List.of(ocena));
-        List<Ocena> all = ocenaService.getOceneForPutovanje(ocena.getPutovanje().getId());
+        when(ocenaMapper.toResponse(ocena)).thenReturn(new OcenaResponseDTO());
+        List<OcenaResponseDTO> all = ocenaService.getOceneForPutovanje(ocena.getPutovanje().getId());
         Assertions.assertThat(all).hasSize(1);
     }
 
     @Test
     public void createOcena_Success(){
+        OcenaRequestDTO ocenaRequestDTO = OcenaRequestDTO.builder()
+                .komentar("komentar")
+                .ocena(4)
+                .korisnikId(1L)
+                .putovanjeId(1L)
+                .build();
         Ocena ocena = builderOcena();
+        when(ocenaMapper.toEntity(ocenaRequestDTO)).thenReturn(ocena);
+        when(korisnikRepository.findById(1L)).thenReturn(Optional.of(savedKorisnik));
+        when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(savedPutovanje));
         when(ocenaRepository.save(ocena)).thenReturn(ocena);
-        Ocena saved = ocenaService.createOcena(ocena);
+        when(ocenaMapper.toResponse(ocena)).thenReturn(new OcenaResponseDTO());
+        OcenaResponseDTO saved = ocenaService.createOcena(ocenaRequestDTO);
         Assertions.assertThat(saved).isNotNull();
     }
 
     @Test
     public void createOcena_ThrowsExceptionWhenAlreadyRated(){
-        Ocena ocena = builderOcena();
-        when(ocenaRepository.existsByKorisnikIdAndPutovanjeId(ocena.getKorisnik().getId(),ocena.getPutovanje().getId()))
+        OcenaRequestDTO ocenaRequestDTO = OcenaRequestDTO.builder()
+                .komentar("komentar")
+                .ocena(4)
+                .korisnikId(1L)
+                .putovanjeId(1L)
+                .build();
+        when(ocenaRepository.existsByKorisnikIdAndPutovanjeId(ocenaRequestDTO.getKorisnikId(),ocenaRequestDTO.getPutovanjeId()))
                 .thenReturn(true);
-        Assertions.assertThatThrownBy(() -> ocenaService.createOcena(ocena))
+        Assertions.assertThatThrownBy(() -> ocenaService.createOcena(ocenaRequestDTO))
                 .isInstanceOf(EntityAlreadyExistsException.class)
                 .hasMessage("Korisnik je već ocenio ovo putovanje");
     }

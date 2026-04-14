@@ -1,6 +1,9 @@
 package com.busticket.app.serviceTests;
 
 import com.busticket.app.exceptions.EntityAlreadyExistsException;
+import com.busticket.app.mapper.KorisnikMapper;
+import com.busticket.app.model.dto.RequestDTOs.KorisnikRequestDTO;
+import com.busticket.app.model.dto.ResponseDTOs.KorisnikResponseDTO;
 import com.busticket.app.model.entity.Korisnik;
 import com.busticket.app.model.entity.enums.Role;
 import com.busticket.app.repository.KorisnikRepository;
@@ -23,7 +26,8 @@ public class KorisnikServiceTest {
 
     @Mock
     private KorisnikRepository korisnikRepository;
-
+    @Mock
+    private KorisnikMapper korisnikMapper;
     @InjectMocks
     private KorisnikService korisnikService;
 
@@ -42,7 +46,8 @@ public class KorisnikServiceTest {
     public void getKorisnikById_Success() {
         Korisnik korisnik = builderKorisnik();
         when(korisnikRepository.findById(1L)).thenReturn(Optional.of(korisnik));
-        Korisnik found = korisnikService.getKorisnikById(1L);
+        when(korisnikMapper.toResponse(korisnik)).thenReturn(new KorisnikResponseDTO());
+        KorisnikResponseDTO found = korisnikService.getKorisnikById(1L);
         Assertions.assertThat(found).isNotNull();
     }
 
@@ -50,7 +55,8 @@ public class KorisnikServiceTest {
     public void getKorisnikByUsername_Success() {
         Korisnik korisnik = builderKorisnik();
         when(korisnikRepository.findByUsername(korisnik.getUsername())).thenReturn(Optional.of(korisnik));
-        Korisnik found = korisnikService.getKorisnikByUsername("username");
+        when(korisnikMapper.toResponse(korisnik)).thenReturn(new KorisnikResponseDTO());
+        KorisnikResponseDTO found = korisnikService.getKorisnikByUsername("username");
         Assertions.assertThat(found).isNotNull();
     }
 
@@ -58,32 +64,57 @@ public class KorisnikServiceTest {
     public void getAllKorisnici_Success() {
         Korisnik korisnik = builderKorisnik();
         when(korisnikRepository.findAll()).thenReturn(List.of(korisnik));
-        List<Korisnik> all = korisnikService.getAllKorisnici();
+        when(korisnikMapper.toResponse(korisnik)).thenReturn(new KorisnikResponseDTO());
+        List<KorisnikResponseDTO> all = korisnikService.getAllKorisnici();
         Assertions.assertThat(all).hasSize(1);
     }
 
     @Test
     public void createKorisnik_Success() {
+        KorisnikRequestDTO korisnikRequestDTO = KorisnikRequestDTO.builder()
+                .ime("KorisnikIme")
+                .prezime("KorisnikPrezime")
+                .email("proba@email.com")
+                .username("username")
+                .password("test")
+                .role(Role.ADMIN)
+                .build();
         Korisnik korisnik = builderKorisnik();
         when(korisnikRepository.save(korisnik)).thenReturn(korisnik);
-        Korisnik saved = korisnikService.createKorisnik(korisnik);
+        when(korisnikMapper.toResponse(korisnik)).thenReturn(new KorisnikResponseDTO());
+        when(korisnikMapper.toEntity(korisnikRequestDTO)).thenReturn(korisnik);
+        KorisnikResponseDTO saved = korisnikService.createKorisnik(korisnikRequestDTO);
         Assertions.assertThat(saved).isNotNull();
     }
 
     @Test
     public void createKorisnik_ThrowsExceptionWhenEmailExists() {
-        Korisnik korisnik = builderKorisnik();
-        when(korisnikRepository.existsByEmail(korisnik.getEmail())).thenReturn(true);
-        Assertions.assertThatThrownBy(() -> korisnikService.createKorisnik(korisnik))
+        KorisnikRequestDTO korisnikRequestDTO = KorisnikRequestDTO.builder()
+                .ime("KorisnikIme")
+                .prezime("KorisnikPrezime")
+                .email("proba@email.com")
+                .username("username")
+                .password("test")
+                .role(Role.ADMIN)
+                .build();
+        when(korisnikRepository.existsByEmail(korisnikRequestDTO.getEmail())).thenReturn(true);
+        Assertions.assertThatThrownBy(() -> korisnikService.createKorisnik(korisnikRequestDTO))
                 .isInstanceOf(EntityAlreadyExistsException.class)
                 .hasMessage("Korisnik sa tim email-om ili username-om već postoji");
     }
 
     @Test
     public void createKorisnik_ThrowsExceptionWhenUsernameExists(){
-        Korisnik korisnik = builderKorisnik();
-        when(korisnikRepository.existsByUsername(korisnik.getUsername())).thenReturn(true);
-        Assertions.assertThatThrownBy(() -> korisnikService.createKorisnik(korisnik))
+        KorisnikRequestDTO korisnikRequestDTO = KorisnikRequestDTO.builder()
+                .ime("KorisnikIme")
+                .prezime("KorisnikPrezime")
+                .email("proba@email.com")
+                .username("username")
+                .password("test")
+                .role(Role.ADMIN)
+                .build();
+        when(korisnikRepository.existsByUsername(korisnikRequestDTO.getUsername())).thenReturn(true);
+        Assertions.assertThatThrownBy(() -> korisnikService.createKorisnik(korisnikRequestDTO))
                 .isInstanceOf(EntityAlreadyExistsException.class)
                 .hasMessage("Korisnik sa tim email-om ili username-om već postoji");
     }
@@ -94,16 +125,25 @@ public class KorisnikServiceTest {
         korisnik.setUsername("novi username");
         when(korisnikRepository.findById(1L)).thenReturn(Optional.of(korisnik));
         when(korisnikRepository.save(korisnik)).thenReturn(korisnik);
-        Korisnik updated = korisnikService.updateKorisnik(
+        when(korisnikMapper.toResponse(korisnik)).thenReturn(new KorisnikResponseDTO());
+        KorisnikResponseDTO updated = korisnikService.updateKorisnik(
                 1L, "novi username", "proba@email.com", "KorisnikIme", "KorisnikPrezime");
         Assertions.assertThat(updated).isNotNull();
     }
 
     @Test
     public void updateKorisnik_ThrowsExceptionWhenEmailExists(){
+        KorisnikRequestDTO korisnikRequestDTO = KorisnikRequestDTO.builder()
+                .ime("KorisnikIme")
+                .prezime("KorisnikPrezime")
+                .email("proba@email.com")
+                .username("username")
+                .password("test")
+                .role(Role.ADMIN)
+                .build();
         Korisnik korisnik = builderKorisnik();
         when(korisnikRepository.findById(1L)).thenReturn(Optional.of(korisnik));
-        when(korisnikRepository.existsByEmail(korisnik.getEmail())).thenReturn(true);
+        when(korisnikRepository.existsByEmail(korisnikRequestDTO.getEmail())).thenReturn(true);
         Assertions.assertThatThrownBy(() -> korisnikService.updateKorisnik(
                 1L, "novi username", "proba@email.com", "KorisnikIme", "KorisnikPrezime"))
                 .isInstanceOf(EntityAlreadyExistsException.class)
