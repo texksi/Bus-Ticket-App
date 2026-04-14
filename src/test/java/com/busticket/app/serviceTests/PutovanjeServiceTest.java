@@ -1,9 +1,14 @@
 package com.busticket.app.serviceTests;
 
+import com.busticket.app.mapper.PutovanjeMapper;
+import com.busticket.app.model.dto.RequestDTOs.PutovanjeRequestDTO;
+import com.busticket.app.model.dto.ResponseDTOs.PutovanjeResponseDTO;
 import com.busticket.app.model.entity.Kompanija;
 import com.busticket.app.model.entity.Putovanje;
 import com.busticket.app.model.entity.Vozilo;
+import com.busticket.app.repository.KompanijaRepository;
 import com.busticket.app.repository.PutovanjeRepository;
+import com.busticket.app.repository.VoziloRepository;
 import com.busticket.app.service.PutovanjeService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +30,12 @@ public class PutovanjeServiceTest {
 
     @Mock
     private PutovanjeRepository putovanjeRepository;
+    @Mock
+    private PutovanjeMapper putovanjeMapper;
+    @Mock
+    private VoziloRepository voziloRepository;
+    @Mock
+    private KompanijaRepository kompanijaRepository;
     @InjectMocks
     private PutovanjeService putovanjeService;
     private Vozilo savedVozilo;
@@ -61,7 +72,8 @@ public class PutovanjeServiceTest {
     public void getPutovanjeById_Success(){
         Putovanje putovanje = builderPutovanje();
         when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(putovanje));
-        Putovanje found = putovanjeService.getPutovanjeById(1L);
+        when(putovanjeMapper.toResponse(putovanje)).thenReturn(new PutovanjeResponseDTO());
+        PutovanjeResponseDTO found = putovanjeService.getPutovanjeById(1L);
         Assertions.assertThat(found).isNotNull();
     }
 
@@ -69,15 +81,29 @@ public class PutovanjeServiceTest {
     public void getAllPutovanja_Success(){
         Putovanje putovanje = builderPutovanje();
         when(putovanjeRepository.findAll()).thenReturn(List.of(putovanje));
-        List<Putovanje> all = putovanjeService.getAllPutovanja();
+        when(putovanjeMapper.toResponse(putovanje)).thenReturn(new PutovanjeResponseDTO());
+        List<PutovanjeResponseDTO> all = putovanjeService.getAllPutovanja();
         Assertions.assertThat(all).hasSize(1);
     }
 
     @Test
     public void createPutovanje_Success(){
+        PutovanjeRequestDTO putovanjeRequestDTO = PutovanjeRequestDTO.builder()
+                .polaziste("polaziste")
+                .odrediste("odrediste")
+                .vremePolaska(LocalDateTime.now())
+                .vremeDolaska(LocalDateTime.now().plusDays(4))
+                .osnovnaCena(100)
+                .kompanijaId(1L)
+                .voziloId(1L)
+                .build();
         Putovanje putovanje = builderPutovanje();
+        when(putovanjeMapper.toEntity(putovanjeRequestDTO)).thenReturn(putovanje);
+        when(voziloRepository.findById(1L)).thenReturn(Optional.of(savedVozilo));
+        when(kompanijaRepository.findById(1L)).thenReturn(Optional.of(savedKompanija));
         when(putovanjeRepository.save(putovanje)).thenReturn(putovanje);
-        Putovanje saved = putovanjeService.createPutovanje(putovanje);
+        when(putovanjeMapper.toResponse(putovanje)).thenReturn(new PutovanjeResponseDTO());
+        PutovanjeResponseDTO saved = putovanjeService.createPutovanje(putovanjeRequestDTO);
         Assertions.assertThat(saved).isNotNull();
     }
 
@@ -86,7 +112,8 @@ public class PutovanjeServiceTest {
         Putovanje putovanje = builderPutovanje();
         when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(putovanje));
         when(putovanjeRepository.save(putovanje)).thenReturn(putovanje);
-        Putovanje updated = putovanjeService.updatePutovanje(1L,"polaziste2","odredostr2",
+        when(putovanjeMapper.toResponse(putovanje)).thenReturn(new PutovanjeResponseDTO());
+        PutovanjeResponseDTO updated = putovanjeService.updatePutovanje(1L,"polaziste2","odredostr2",
                 LocalDateTime.now().plusDays(2),LocalDateTime.now().plusDays(5),100);
         Assertions.assertThat(updated).isNotNull();
     }
@@ -102,7 +129,8 @@ public class PutovanjeServiceTest {
     public void getPutovanjaByKompanija_Success(){
         Putovanje putovanje = builderPutovanje();
         when(putovanjeRepository.findAllByKompanijaId(putovanje.getKompanija().getId())).thenReturn(List.of(putovanje));
-        List<Putovanje> all = putovanjeService.getPutovanjaByKompanija(putovanje.getKompanija().getId());
+        when(putovanjeMapper.toResponse(putovanje)).thenReturn(new PutovanjeResponseDTO());
+        List<PutovanjeResponseDTO> all = putovanjeService.getPutovanjaByKompanija(putovanje.getKompanija().getId());
         Assertions.assertThat(all).hasSize(1);
     }
 
