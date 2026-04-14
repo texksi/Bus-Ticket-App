@@ -1,0 +1,408 @@
+{
+  "info": {
+    "name": "Bus Ticket App",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Korisnik",
+      "item": [
+        {
+          "name": "Get All Korisnici",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/korisnici"
+          }
+        },
+        {
+          "name": "Get Korisnik By ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/korisnici/1"
+          }
+        },
+        {
+          "name": "Get Rezervacije By Korisnik",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/korisnici/1/rezervacije"
+          }
+        },
+        {
+          "name": "Get Ocene By Korisnik",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/korisnici/1/ocene"
+          }
+        },
+        {
+          "name": "Create Korisnik",
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/api/korisnici",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ime\": \"Marko\",\n  \"prezime\": \"Markovic\",\n  \"email\": \"marko@email.com\",\n  \"username\": \"marko123\",\n  \"password\": \"lozinka123\",\n  \"role\": \"USER\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Korisnik",
+          "request": {
+            "method": "PUT",
+            "url": "http://localhost:8080/api/korisnici/1",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ime\": \"NovoIme\",\n  \"prezime\": \"NovoPrezime\",\n  \"email\": \"novo@email.com\",\n  \"username\": \"noviusername\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Korisnik",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:8080/api/korisnici/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rezervacija",
+      "item": [
+        {
+          "name": "Get All Rezervacije",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/rezervacije"
+          }
+        },
+        {
+          "name": "Get Rezervacija By ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/rezervacije/1"
+          }
+        },
+        {
+          "name": "Get Karte By Rezervacija",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/rezervacije/1/karte"
+          }
+        },
+        {
+          "name": "Create Rezervacija",
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/api/rezervacije",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nacinPlacanja\": \"Kartica\",\n  \"status\": \"pending\",\n  \"ukupanIznos\": 1500,\n  \"korisnikId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Rezervacija",
+          "request": {
+            "method": "PUT",
+            "url": "http://localhost:8080/api/rezervacije/1",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"confirmed\",\n  \"nacinPlacanja\": \"Gotovina\",\n  \"ukupanIznos\": 1500\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Rezervacija",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:8080/api/rezervacije/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Karta",
+      "item": [
+        {
+          "name": "Get Karta By ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/karte/1"
+          }
+        },
+        {
+          "name": "Get Karte By Putovanje",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/karte/putovanje/1"
+          }
+        },
+        {
+          "name": "Create Karta",
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/api/karte",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brojSedista\": \"A1\",\n  \"osnovnaCena\": 500,\n  \"tip\": \"regular\",\n  \"rezervacijaId\": 1,\n  \"putovanjeId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Karta",
+          "request": {
+            "method": "PUT",
+            "url": "http://localhost:8080/api/karte/1",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brojSedista\": \"B2\",\n  \"tip\": \"premium\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Karta",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:8080/api/karte/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Putovanje",
+      "item": [
+        {
+          "name": "Get All Putovanja",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/putovanja"
+          }
+        },
+        {
+          "name": "Get Putovanje By ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/putovanja/1"
+          }
+        },
+        {
+          "name": "Get Ocene By Putovanje",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/putovanja/1/ocene"
+          }
+        },
+        {
+          "name": "Create Putovanje",
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/api/putovanja",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"polaziste\": \"Beograd\",\n  \"odrediste\": \"Novi Sad\",\n  \"vremePolaska\": \"2026-04-15T08:00:00\",\n  \"vremeDolaska\": \"2026-04-15T09:30:00\",\n  \"osnovnaCena\": 800,\n  \"kompanijaId\": 1,\n  \"voziloId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Putovanje",
+          "request": {
+            "method": "PUT",
+            "url": "http://localhost:8080/api/putovanja/1",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"polaziste\": \"Beograd\",\n  \"odrediste\": \"Nis\",\n  \"vremePolaska\": \"2026-04-15T10:00:00\",\n  \"vremeDolaska\": \"2026-04-15T13:00:00\",\n  \"osnovnaCena\": 1200,\n  \"kompanijaId\": 1,\n  \"voziloId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Putovanje",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:8080/api/putovanja/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ocena",
+      "item": [
+        {
+          "name": "Create Ocena",
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/api/ocene",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"komentar\": \"Odlicna voznja!\",\n  \"ocena\": 5,\n  \"korisnikId\": 1,\n  \"putovanjeId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Ocena",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:8080/api/ocene/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Placanje",
+      "item": [
+        {
+          "name": "Get Placanje By ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/placanja/1"
+          }
+        },
+        {
+          "name": "Get Placanja By Rezervacija",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/placanja/rezervacija/1"
+          }
+        },
+        {
+          "name": "Create Payment Intent",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "http://localhost:8080/api/placanja/create-payment?rezervacijaId=1&iznos=1500",
+              "host": ["http://localhost:8080"],
+              "path": ["api", "placanja", "create-payment"],
+              "query": [
+                {"key": "rezervacijaId", "value": "1"},
+                {"key": "iznos", "value": "1500"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Kompanija",
+      "item": [
+        {
+          "name": "Get All Kompanije",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/kompanije"
+          }
+        },
+        {
+          "name": "Get Kompanija By ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/kompanije/1"
+          }
+        },
+        {
+          "name": "Get Putovanja By Kompanija",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/kompanije/1/putovanja"
+          }
+        },
+        {
+          "name": "Get Vozila By Kompanija",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/kompanije/1/vozila"
+          }
+        },
+        {
+          "name": "Create Kompanija",
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/api/kompanije",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"naziv\": \"BusLine\",\n  \"kontakt\": \"busline@email.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Kompanija",
+          "request": {
+            "method": "PUT",
+            "url": "http://localhost:8080/api/kompanije/1",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"naziv\": \"NoviBusLine\",\n  \"kontakt\": \"novibusline@email.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Kompanija",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:8080/api/kompanije/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vozilo",
+      "item": [
+        {
+          "name": "Get Vozilo By ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/vozila/1"
+          }
+        },
+        {
+          "name": "Get Vozila By Kompanija",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/vozila/kompanija/1"
+          }
+        },
+        {
+          "name": "Create Vozilo",
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/api/vozila",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"registracija\": \"BG123AB\",\n  \"kapacitet\": 50,\n  \"brojRedova\": 10,\n  \"brojKolona\": 5,\n  \"kompanijaId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Vozilo",
+          "request": {
+            "method": "PUT",
+            "url": "http://localhost:8080/api/vozila/1",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"registracija\": \"BG456CD\",\n  \"kapacitet\": 40,\n  \"brojRedova\": 8,\n  \"brojKolona\": 5,\n  \"kompanijaId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Vozilo",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:8080/api/vozila/1"
+          }
+        }
+      ]
+    }
+  ]
+}

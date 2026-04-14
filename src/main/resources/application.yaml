@@ -15,5 +15,8 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 stripe:
   secret-key: ${STRIPE_SECRET_KEY}
+springdoc:
+  swagger-ui:
+    url: /openapi.yaml
 
 
