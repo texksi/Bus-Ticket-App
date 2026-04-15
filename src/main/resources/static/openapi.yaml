@@ -1,0 +1,1139 @@
+openapi: 3.1.0
+info:
+  title: Bus Ticket App
+  description: |-
+    REST API for managing bus ticket reservations, trips, companies, vehicles and payments.
+    Built with Spring Boot and integrated with Stripe for payment processing.
+
+    Some useful links:
+    - [Bus Ticket App repository](https://github.com/texksi/Bus-Ticket-App)
+  contact:
+    email: teamikic18@gmail.com
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: https://swagger.io
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: Korisnik
+    description: API rute za korisnika
+  - name: Rezervacija
+    description: API rute za rezervaciju
+  - name: Karta
+    description: API rute za kartu
+  - name: Putovanje
+    description: API rute za putovanje
+  - name: Ocena
+    description: API rute za ocene
+  - name: Placanje
+    description: API rute za placanje
+  - name: Kompanija
+    description: API rute za kompaniju
+  - name: Vozilo
+    description: API rute za vozilo
+paths:
+  /api/korisnici:
+    get:
+      tags:
+        - Korisnik
+      summary: Get all users
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KorisnikResponse'
+    post:
+      tags:
+        - Korisnik
+      summary: Create new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KorisnikRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KorisnikResponse'
+        '409':
+          description: User already exists
+
+  /api/korisnici/{id}:
+    get:
+      tags:
+        - Korisnik
+      summary: Get user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KorisnikResponse'
+        '404':
+          description: User not found
+    put:
+      tags:
+        - Korisnik
+      summary: Update user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KorisnikRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KorisnikResponse'
+        '404':
+          description: User not found
+    delete:
+      tags:
+        - Korisnik
+      summary: Delete user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: No Content
+
+  /api/korisnici/{id}/rezervacije:
+    get:
+      tags:
+        - Korisnik
+      summary: Get all reservations for user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RezervacijaResponse'
+
+  /api/korisnici/{id}/ocene:
+    get:
+      tags:
+        - Korisnik
+      summary: Get all ratings for user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OcenaResponse'
+
+  /api/rezervacije:
+    get:
+      tags:
+        - Rezervacija
+      summary: Get all reservations
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RezervacijaResponse'
+    post:
+      tags:
+        - Rezervacija
+      summary: Create new reservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RezervacijaRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RezervacijaResponse'
+
+  /api/rezervacije/{id}:
+    get:
+      tags:
+        - Rezervacija
+      summary: Get reservation by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RezervacijaResponse'
+        '404':
+          description: Reservation not found
+    put:
+      tags:
+        - Rezervacija
+      summary: Update reservation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RezervacijaRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RezervacijaResponse'
+    delete:
+      tags:
+        - Rezervacija
+      summary: Delete reservation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: No Content
+
+  /api/rezervacije/{id}/karte:
+    get:
+      tags:
+        - Rezervacija
+      summary: Get all tickets for reservation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KartaResponse'
+
+  /api/karte:
+    post:
+      tags:
+        - Karta
+      summary: Create new ticket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KartaRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KartaResponse'
+
+  /api/karte/{id}:
+    get:
+      tags:
+        - Karta
+      summary: Get ticket by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KartaResponse'
+        '404':
+          description: Ticket not found
+    put:
+      tags:
+        - Karta
+      summary: Update ticket
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KartaRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KartaResponse'
+    delete:
+      tags:
+        - Karta
+      summary: Delete ticket
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: No Content
+
+  /api/karte/putovanje/{id}:
+    get:
+      tags:
+        - Karta
+      summary: Get all tickets for trip
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KartaResponse'
+
+  /api/putovanja:
+    get:
+      tags:
+        - Putovanje
+      summary: Get all trips
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PutovanjeResponse'
+    post:
+      tags:
+        - Putovanje
+      summary: Create new trip
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutovanjeRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PutovanjeResponse'
+
+  /api/putovanja/{id}:
+    get:
+      tags:
+        - Putovanje
+      summary: Get trip by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PutovanjeResponse'
+        '404':
+          description: Trip not found
+    put:
+      tags:
+        - Putovanje
+      summary: Update trip
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutovanjeRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PutovanjeResponse'
+    delete:
+      tags:
+        - Putovanje
+      summary: Delete trip
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: No Content
+
+  /api/putovanja/{id}/ocene:
+    get:
+      tags:
+        - Putovanje
+      summary: Get all ratings for trip
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OcenaResponse'
+
+  /api/ocene:
+    post:
+      tags:
+        - Ocena
+      summary: Create new rating
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OcenaRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcenaResponse'
+        '409':
+          description: User already rated this trip
+
+  /api/ocene/{id}:
+    delete:
+      tags:
+        - Ocena
+      summary: Delete rating
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: No Content
+
+  /api/placanja/{id}:
+    get:
+      tags:
+        - Placanje
+      summary: Get payment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlacanjeResponse'
+
+  /api/placanja/rezervacija/{id}:
+    get:
+      tags:
+        - Placanje
+      summary: Get payment for reservation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlacanjeResponse'
+
+  /api/placanja/create-payment:
+    post:
+      tags:
+        - Placanje
+      summary: Create Stripe payment intent
+      parameters:
+        - name: rezervacijaId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: iznos
+          in: query
+          required: true
+          schema:
+            type: number
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlacanjeResponse'
+
+  /api/kompanije:
+    get:
+      tags:
+        - Kompanija
+      summary: Get all companies
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KompanijaResponse'
+    post:
+      tags:
+        - Kompanija
+      summary: Create new company
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KompanijaRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KompanijaResponse'
+
+  /api/kompanije/{id}:
+    get:
+      tags:
+        - Kompanija
+      summary: Get company by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KompanijaResponse'
+        '404':
+          description: Company not found
+    put:
+      tags:
+        - Kompanija
+      summary: Update company
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KompanijaRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KompanijaResponse'
+    delete:
+      tags:
+        - Kompanija
+      summary: Delete company
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: No Content
+
+  /api/kompanije/{id}/putovanja:
+    get:
+      tags:
+        - Kompanija
+      summary: Get all trips for company
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PutovanjeResponse'
+
+  /api/kompanije/{id}/vozila:
+    get:
+      tags:
+        - Kompanija
+      summary: Get all vehicles for company
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VoziloResponse'
+
+  /api/vozila:
+    post:
+      tags:
+        - Vozilo
+      summary: Create new vehicle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoziloRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoziloResponse'
+        '409':
+          description: Vehicle with this registration already exists
+
+  /api/vozila/{id}:
+    get:
+      tags:
+        - Vozilo
+      summary: Get vehicle by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoziloResponse'
+        '404':
+          description: Vehicle not found
+    put:
+      tags:
+        - Vozilo
+      summary: Update vehicle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoziloRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoziloResponse'
+    delete:
+      tags:
+        - Vozilo
+      summary: Delete vehicle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: No Content
+
+  /api/vozila/kompanija/{id}:
+    get:
+      tags:
+        - Vozilo
+      summary: Get all vehicles for company
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VoziloResponse'
+
+components:
+  schemas:
+    KorisnikRequest:
+      type: object
+      properties:
+        ime:
+          type: string
+          example: "Marko"
+        prezime:
+          type: string
+          example: "Markovic"
+        email:
+          type: string
+          format: email
+          example: "marko@email.com"
+        username:
+          type: string
+          example: "marko123"
+        password:
+          type: string
+          example: "lozinka123"
+        role:
+          type: string
+          enum:
+            - ADMIN
+            - USER
+
+    KorisnikResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        ime:
+          type: string
+        prezime:
+          type: string
+        email:
+          type: string
+        username:
+          type: string
+        role:
+          type: string
+          enum:
+            - ADMIN
+            - USER
+
+    RezervacijaRequest:
+      type: object
+      properties:
+        nacinPlacanja:
+          type: string
+          example: "Kartica"
+        status:
+          type: string
+          example: "pending"
+        ukupanIznos:
+          type: number
+          example: 1500
+        korisnikId:
+          type: integer
+          format: int64
+          example: 1
+
+    RezervacijaResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        datumKreiranja:
+          type: string
+          format: date-time
+        ukupanIznos:
+          type: number
+        nacinPlacanja:
+          type: string
+        status:
+          type: string
+        korisnikId:
+          type: integer
+          format: int64
+
+    KartaRequest:
+      type: object
+      properties:
+        brojSedista:
+          type: string
+          example: "A1"
+        osnovnaCena:
+          type: number
+          example: 500
+        tip:
+          type: string
+          example: "regular"
+        rezervacijaId:
+          type: integer
+          format: int64
+          example: 1
+        putovanjeId:
+          type: integer
+          format: int64
+          example: 1
+
+    KartaResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        brojSedista:
+          type: string
+        osnovnaCena:
+          type: number
+        datumIzdavanja:
+          type: string
+          format: date-time
+        tip:
+          type: string
+        rezervacijaId:
+          type: integer
+          format: int64
+        putovanjeId:
+          type: integer
+          format: int64
+
+    PutovanjeRequest:
+      type: object
+      properties:
+        polaziste:
+          type: string
+          example: "Beograd"
+        odrediste:
+          type: string
+          example: "Novi Sad"
+        vremePolaska:
+          type: string
+          format: date-time
+          example: "2026-04-15T08:00:00"
+        vremeDolaska:
+          type: string
+          format: date-time
+          example: "2026-04-15T09:30:00"
+        osnovnaCena:
+          type: number
+          example: 800
+        kompanijaId:
+          type: integer
+          format: int64
+          example: 1
+        voziloId:
+          type: integer
+          format: int64
+          example: 1
+
+    PutovanjeResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        polaziste:
+          type: string
+        odrediste:
+          type: string
+        vremePolaska:
+          type: string
+          format: date-time
+        vremeDolaska:
+          type: string
+          format: date-time
+        osnovnaCena:
+          type: number
+        kompanijaId:
+          type: integer
+          format: int64
+        voziloId:
+          type: integer
+          format: int64
+
+    OcenaRequest:
+      type: object
+      properties:
+        komentar:
+          type: string
+          example: "Odlicna voznja!"
+        ocena:
+          type: integer
+          example: 5
+        korisnikId:
+          type: integer
+          format: int64
+          example: 1
+        putovanjeId:
+          type: integer
+          format: int64
+          example: 1
+
+    OcenaResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        komentar:
+          type: string
+        ocena:
+          type: integer
+        korisnikId:
+          type: integer
+          format: int64
+        putovanjeId:
+          type: integer
+          format: int64
+
+    PlacanjeResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        stripePaymentId:
+          type: string
+        iznos:
+          type: number
+        datum:
+          type: string
+          format: date-time
+        status:
+          type: string
+        rezervacijaId:
+          type: integer
+          format: int64
+
+    KompanijaRequest:
+      type: object
+      properties:
+        naziv:
+          type: string
+          example: "BusLine"
+        kontakt:
+          type: string
+          example: "busline@email.com"
+
+    KompanijaResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        naziv:
+          type: string
+        kontakt:
+          type: string
+
+    VoziloRequest:
+      type: object
+      properties:
+        registracija:
+          type: string
+          example: "BG123AB"
+        kapacitet:
+          type: integer
+          example: 50
+        brojRedova:
+          type: integer
+          example: 10
+        brojKolona:
+          type: integer
+          example: 5
+        kompanijaId:
+          type: integer
+          format: int64
+          example: 1
+
+    VoziloResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        registracija:
+          type: string
+        kapacitet:
+          type: integer
+        brojRedova:
+          type: integer
+        brojKolona:
+          type: integer
+        kompanijaId:
+          type: integer
+          format: int64
