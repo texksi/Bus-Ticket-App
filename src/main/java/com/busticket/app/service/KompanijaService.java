@@ -1,6 +1,9 @@
 package com.busticket.app.service;
 
 import com.busticket.app.exceptions.EntityNotFoundException;
+import com.busticket.app.mapper.KompanijaMapper;
+import com.busticket.app.model.dto.RequestDTOs.KompanijaRequestDTO;
+import com.busticket.app.model.dto.ResponseDTOs.KompanijaResponseDTO;
 import com.busticket.app.model.entity.Kompanija;
 import com.busticket.app.repository.KompanijaRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,27 +16,36 @@ import java.util.List;
 public class KompanijaService {
 
     private final KompanijaRepository kompanijaRepository;
+    private final KompanijaMapper kompanijaMapper;
 
-    public Kompanija getKompanijaById(Long id){
-        return kompanijaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Kompanija nije pronađena"));
+    public KompanijaResponseDTO getKompanijaById(Long id) {
+        Kompanija kompanija = kompanijaRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Kompanija nije pronađena"));
+        return kompanijaMapper.toResponse(kompanija);
     }
 
-    public List<Kompanija> getAllKompanije(){
-        return kompanijaRepository.findAll();
+    public List<KompanijaResponseDTO> getAllKompanije() {
+        List<Kompanija> kompanije = kompanijaRepository.findAll();
+        return kompanije.stream().map(kompanijaMapper::toResponse).toList();
     }
 
-    public Kompanija createKompanija(Kompanija kompanija){
-        return kompanijaRepository.save(kompanija);
+    public KompanijaResponseDTO createKompanija(KompanijaRequestDTO newKompanija) {
+        Kompanija kompanija = kompanijaMapper.toEntity(newKompanija);
+        Kompanija saved = kompanijaRepository.save(kompanija);
+        return kompanijaMapper.toResponse(saved);
     }
 
-    public Kompanija updateKompanija(Long id, String naziv, String kontakt){
-        Kompanija savedKompanija = getKompanijaById(id);
+    public KompanijaResponseDTO updateKompanija(Long id, String naziv, String kontakt) {
+        Kompanija savedKompanija = kompanijaRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Kompanija nije pronadjena")
+        );
         savedKompanija.setNaziv(naziv);
         savedKompanija.setKontakt(kontakt);
-        return kompanijaRepository.save(savedKompanija);
+        Kompanija kompanija = kompanijaRepository.save(savedKompanija);
+        return kompanijaMapper.toResponse(kompanija);
     }
 
-    public void deleteKompanija(Long id){
+    public void deleteKompanija(Long id) {
         kompanijaRepository.deleteById(id);
     }
 }

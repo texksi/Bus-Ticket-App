@@ -1,5 +1,7 @@
 package com.busticket.app.serviceTests;
 
+import com.busticket.app.mapper.PlacanjeMapper;
+import com.busticket.app.model.dto.ResponseDTOs.PlacanjeResponseDTO;
 import com.busticket.app.model.entity.Placanje;
 import com.busticket.app.model.entity.Rezervacija;
 import com.busticket.app.repository.PlacanjeRepository;
@@ -23,6 +25,8 @@ public class PlacanjeServiceTest {
 
     @Mock
     private PlacanjeRepository placanjeRepository;
+    @Mock
+    private PlacanjeMapper placanjeMapper;
     @InjectMocks
     private PlacanjeService placanjeService;
     private Rezervacija savedRezervacija;
@@ -51,7 +55,8 @@ public class PlacanjeServiceTest {
     public void getPlacanjeById_Success(){
         Placanje placanje = builderPlacanje();
         when(placanjeRepository.findById(1L)).thenReturn(Optional.of(placanje));
-        Placanje found = placanjeService.getPlacanjeById(1L);
+        when(placanjeMapper.toResponse(placanje)).thenReturn(new PlacanjeResponseDTO());
+        PlacanjeResponseDTO found = placanjeService.getPlacanjeById(1L);
         Assertions.assertThat(found).isNotNull();
     }
 
@@ -59,7 +64,8 @@ public class PlacanjeServiceTest {
     public void getPlacanjaForRezervacija_Success(){
         Placanje placanje = builderPlacanje();
         when(placanjeRepository.findAllByRezervacijaId(placanje.getRezervacija().getId())).thenReturn(List.of(placanje));
-        List<Placanje> all = placanjeService.getPlacanjaForRezervacija(placanje.getRezervacija().getId());
+        when(placanjeMapper.toResponse(placanje)).thenReturn(new PlacanjeResponseDTO());
+        List<PlacanjeResponseDTO> all = placanjeService.getPlacanjaForRezervacija(placanje.getRezervacija().getId());
         Assertions.assertThat(all).hasSize(1);
     }
 }

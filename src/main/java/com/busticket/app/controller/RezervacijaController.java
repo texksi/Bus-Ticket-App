@@ -1,10 +1,12 @@
 package com.busticket.app.controller;
 
-import com.busticket.app.model.entity.Karta;
-import com.busticket.app.model.entity.Rezervacija;
+import com.busticket.app.model.dto.RequestDTOs.RezervacijaRequestDTO;
+import com.busticket.app.model.dto.ResponseDTOs.KartaResponseDTO;
+import com.busticket.app.model.dto.ResponseDTOs.RezervacijaResponseDTO;
 import com.busticket.app.service.KartaService;
 import com.busticket.app.service.RezervacijaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,33 +19,35 @@ public class RezervacijaController {
     private final KartaService kartaService;
 
     @GetMapping("/api/rezervacije")
-    public List<Rezervacija> getAllRezervacije() {
-        return rezervacijaService.getAllRezervacije();
+    public ResponseEntity<List<RezervacijaResponseDTO>> getAllRezervacije() {
+        return ResponseEntity.ok(rezervacijaService.getAllRezervacije());
     }
 
     @GetMapping("/api/rezervacije/{id}")
-    public Rezervacija getRezervacijaById(@PathVariable Long id) {
-        return rezervacijaService.getRezervacijaById(id);
+    public ResponseEntity<RezervacijaResponseDTO> getRezervacijaById(@PathVariable Long id) {
+        return ResponseEntity.ok(rezervacijaService.getRezervacijaById(id));
     }
 
     @GetMapping("/api/rezervacije/{id}/karte")
-    public List<Karta> getAllKarteForRezervacija(@PathVariable Long id) {
-        return kartaService.getAllKarteForRezervacija(id);
+    public ResponseEntity<List<KartaResponseDTO>> getAllKarteForRezervacija(@PathVariable Long id) {
+        return ResponseEntity.ok(kartaService.getAllKarteForRezervacija(id));
     }
 
     @PostMapping("/api/rezervacije")
-    public Rezervacija createRezervacija(@RequestBody Rezervacija rezervacija) {
-        return rezervacijaService.createRezervacija(rezervacija);
+    public ResponseEntity<RezervacijaResponseDTO> createRezervacija(@RequestBody RezervacijaRequestDTO rezervacija) {
+        return ResponseEntity.status(201).body(rezervacijaService.createRezervacija(rezervacija));
     }
 
     @PutMapping("/api/rezervacije/{id}")
-    public Rezervacija updateRezervacija(@RequestBody Rezervacija rezervacija, @PathVariable Long id) {
-        return rezervacijaService.updateRezervacija(id, rezervacija.getStatus(), rezervacija.getNacinPlacanja(),
-                rezervacija.getUkupanIznos());
+    public ResponseEntity<RezervacijaResponseDTO> updateRezervacija(@RequestBody RezervacijaRequestDTO rezervacija,
+                                                                    @PathVariable Long id) {
+        return ResponseEntity.ok(rezervacijaService.updateRezervacija(id, rezervacija.getStatus(),
+                rezervacija.getNacinPlacanja(), rezervacija.getUkupanIznos()));
     }
 
     @DeleteMapping("/api/rezervacije/{id}")
-    public void deleteRezervacija(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteRezervacija(@PathVariable Long id) {
         rezervacijaService.deleteRezervacija(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,11 +1,16 @@
 package com.busticket.app.serviceTests;
 
+import com.busticket.app.mapper.KartaMapper;
+import com.busticket.app.model.dto.RequestDTOs.KartaRequestDTO;
+import com.busticket.app.model.dto.ResponseDTOs.KartaResponseDTO;
 import com.busticket.app.model.entity.Karta;
 import com.busticket.app.model.entity.Korisnik;
 import com.busticket.app.model.entity.Putovanje;
 import com.busticket.app.model.entity.Rezervacija;
 import com.busticket.app.model.entity.enums.Role;
 import com.busticket.app.repository.KartaRepository;
+import com.busticket.app.repository.PutovanjeRepository;
+import com.busticket.app.repository.RezervacijaRepository;
 import com.busticket.app.service.KartaService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,12 +33,18 @@ public class KartaServiceTest {
 
     @Mock
     private KartaRepository kartaRepository;
+    @Mock
+    private KartaMapper kartaMapper;
+    @Mock
+    private RezervacijaRepository rezervacijaRepository;
+    @Mock
+    private PutovanjeRepository putovanjeRepository;
     @InjectMocks
     private KartaService kartaService;
     private Rezervacija savedRezervacija;
     private Putovanje savedPutovanje;
 
-    private Karta builderKarta(){
+    private Karta builderKarta() {
         return Karta.builder()
                 .brojSedista("W1")
                 .osnovnaCena(100)
@@ -44,8 +56,8 @@ public class KartaServiceTest {
     }
 
     @BeforeEach
-    public void setup(){
-         Korisnik savedKorisnik = Korisnik.builder()
+    public void setup() {
+        Korisnik savedKorisnik = Korisnik.builder()
                 .ime("KorisnikIme")
                 .prezime("KorisnikPrezime")
                 .email("proba@email.com")
@@ -53,13 +65,13 @@ public class KartaServiceTest {
                 .password("test")
                 .role(Role.ADMIN)
                 .build();
-         savedRezervacija = Rezervacija.builder()
+        savedRezervacija = Rezervacija.builder()
                 .datumKreiranja(LocalDateTime.now())
                 .ukupanIznos(100)
                 .nacinPlacanja("Kartica")
                 .status("pending")
                 .korisnik(savedKorisnik).build();
-         savedPutovanje = Putovanje.builder()
+        savedPutovanje = Putovanje.builder()
                 .polaziste("polaziste")
                 .odrediste("odrediste")
                 .vremePolaska(LocalDateTime.now())
@@ -71,58 +83,74 @@ public class KartaServiceTest {
     }
 
     @Test
-    public void getKartaById_Success(){
+    public void getKartaById_Success() {
         Karta karta = builderKarta();
         when(kartaRepository.findById(1L)).thenReturn(Optional.of(karta));
-        Karta found = kartaService.getKartaById(1L);
+        when(kartaMapper.toResponse(karta)).thenReturn(new KartaResponseDTO());
+        KartaResponseDTO found = kartaService.getKartaById(1L);
         Assertions.assertThat(found).isNotNull();
     }
 
     @Test
-    public void getAllKarte_Success(){
+    public void getAllKarte_Success() {
         Karta karta = builderKarta();
         when(kartaRepository.findAll()).thenReturn(List.of(karta));
-        List<Karta> all = kartaService.getAllKarte();
+        when(kartaMapper.toResponse(karta)).thenReturn(new KartaResponseDTO());
+        List<KartaResponseDTO> all = kartaService.getAllKarte();
         Assertions.assertThat(all).hasSize(1);
     }
 
     @Test
-    public void createKarta_Success(){
+    public void createKarta_Success() {
+        KartaRequestDTO request = KartaRequestDTO.builder()
+                .brojSedista("W1")
+                .osnovnaCena(100)
+                .tip("regular")
+                .rezervacijaId(1L)
+                .putovanjeId(1L)
+                .build();
         Karta karta = builderKarta();
-        when(kartaRepository.save(karta)).thenReturn(karta);
-        Karta saved = kartaService.createKarta(karta);
+        when(kartaRepository.save(any(Karta.class))).thenReturn(karta);
+        when(kartaMapper.toEntity(request)).thenReturn(karta);
+        when(rezervacijaRepository.findById(1L)).thenReturn(Optional.of(savedRezervacija));
+        when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(savedPutovanje));
+        when(kartaMapper.toResponse(karta)).thenReturn(new KartaResponseDTO());
+        KartaResponseDTO saved = kartaService.createKarta(request);
         Assertions.assertThat(saved).isNotNull();
     }
 
     @Test
-    public void updateKarta_Success(){
+    public void updateKarta_Success() {
         Karta karta = builderKarta();
         when(kartaRepository.findById(1L)).thenReturn(Optional.of(karta));
         when(kartaRepository.save(karta)).thenReturn(karta);
-        Karta updated = kartaService.updateKarta(1L,"2ad","regular");
+        when(kartaMapper.toResponse(karta)).thenReturn(new KartaResponseDTO());
+        KartaResponseDTO updated = kartaService.updateKarta(1L, "2ad", "regular");
         Assertions.assertThat(updated).isNotNull();
     }
 
     @Test
-    public void deleteKarta_Success(){
+    public void deleteKarta_Success() {
         Karta karta = builderKarta();
         kartaService.deleteKarta(1L);
         verify(kartaRepository).deleteById(1L);
     }
 
     @Test
-    public void getAllKarteForPutovanje_Success(){
+    public void getAllKarteForPutovanje_Success() {
         Karta karta = builderKarta();
         when(kartaRepository.findAllByPutovanjeId(karta.getPutovanje().getId())).thenReturn(List.of(karta));
-        List<Karta> all = kartaService.getAllKarteForPutovanje(karta.getPutovanje().getId());
+        when(kartaMapper.toResponse(karta)).thenReturn(new KartaResponseDTO());
+        List<KartaResponseDTO> all = kartaService.getAllKarteForPutovanje(karta.getPutovanje().getId());
         Assertions.assertThat(all).hasSize(1);
     }
 
     @Test
-    public void getAllKarteForRezervacija_Success(){
+    public void getAllKarteForRezervacija_Success() {
         Karta karta = builderKarta();
         when(kartaRepository.findAllByRezervacijaId(karta.getRezervacija().getId())).thenReturn(List.of(karta));
-        List<Karta> all = kartaService.getAllKarteForRezervacija(karta.getRezervacija().getId());
+        when(kartaMapper.toResponse(karta)).thenReturn(new KartaResponseDTO());
+        List<KartaResponseDTO> all = kartaService.getAllKarteForRezervacija(karta.getRezervacija().getId());
         Assertions.assertThat(all).hasSize(1);
     }
 }

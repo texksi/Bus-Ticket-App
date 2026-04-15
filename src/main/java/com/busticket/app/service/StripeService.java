@@ -1,6 +1,8 @@
 package com.busticket.app.service;
 
 import com.busticket.app.exceptions.EntityNotFoundException;
+import com.busticket.app.mapper.PlacanjeMapper;
+import com.busticket.app.model.dto.ResponseDTOs.PlacanjeResponseDTO;
 import com.busticket.app.model.entity.Placanje;
 import com.busticket.app.repository.PlacanjeRepository;
 import com.busticket.app.repository.RezervacijaRepository;
@@ -13,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +22,9 @@ public class StripeService {
 
     @Value("${stripe.secret-key}")
     private String secretKey;
-    private RezervacijaRepository rezervacijaRepository;
-    private PlacanjeRepository placanjeRepository;
+    private final RezervacijaRepository rezervacijaRepository;
+    private final PlacanjeRepository placanjeRepository;
+    private final PlacanjeMapper placanjeMapper;
 
     @PostConstruct
     public void initStripe() {
@@ -37,7 +39,7 @@ public class StripeService {
         return PaymentIntent.create(params);
     }
 
-    public Placanje createPlacanje(Long rezervacijaId, double iznos) throws StripeException {
+    public PlacanjeResponseDTO createPlacanje(Long rezervacijaId, double iznos) throws StripeException {
         PaymentIntent paymentIntent = createPaymentIntent(iznos);
         Placanje placanje = Placanje.builder()
                 .stripePaymentId(paymentIntent.getId())
@@ -46,7 +48,8 @@ public class StripeService {
                 .rezervacija(rezervacijaRepository.findById(rezervacijaId)
                         .orElseThrow(() -> new EntityNotFoundException("Rezervacija ne postoji")))
                 .build();
-        return placanjeRepository.save(placanje);
+        Placanje placanjeSaved = placanjeRepository.save(placanje);
+        return placanjeMapper.toResponse(placanjeSaved);
     }
 }
 
