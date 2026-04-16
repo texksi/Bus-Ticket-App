@@ -5,6 +5,7 @@ import com.busticket.app.model.dto.ResponseDTOs.PlacanjeResponseDTO;
 import com.busticket.app.model.entity.Placanje;
 import com.busticket.app.model.entity.Rezervacija;
 import com.busticket.app.repository.PlacanjeRepository;
+import com.busticket.app.repository.RezervacijaRepository;
 import com.busticket.app.service.PlacanjeService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,8 @@ public class PlacanjeServiceTest {
     private PlacanjeRepository placanjeRepository;
     @Mock
     private PlacanjeMapper placanjeMapper;
+    @Mock
+    private RezervacijaRepository rezervacijaRepository;
     @InjectMocks
     private PlacanjeService placanjeService;
     private Rezervacija savedRezervacija;
@@ -63,9 +66,10 @@ public class PlacanjeServiceTest {
     @Test
     public void getPlacanjaForRezervacija_Success(){
         Placanje placanje = builderPlacanje();
-        when(placanjeRepository.findAllByRezervacijaId(placanje.getRezervacija().getId())).thenReturn(List.of(placanje));
+        when(rezervacijaRepository.findById(1L)).thenReturn(Optional.of(new Rezervacija()));
+        when(placanjeRepository.findAllByRezervacijaId(1L)).thenReturn(List.of(placanje));
         when(placanjeMapper.toResponse(placanje)).thenReturn(new PlacanjeResponseDTO());
-        List<PlacanjeResponseDTO> all = placanjeService.getPlacanjaForRezervacija(placanje.getRezervacija().getId());
+        List<PlacanjeResponseDTO> all = placanjeService.getPlacanjaForRezervacija(1L);
         Assertions.assertThat(all).hasSize(1);
     }
 }

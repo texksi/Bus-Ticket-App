@@ -66,9 +66,10 @@ public class VoziloServiceTest {
     @Test
     public void getAllVozilaForKompanija_Success() {
         Vozilo vozilo = builderVozilo();
-        when(voziloRepository.findAllByKompanijaId(vozilo.getKompanija().getId())).thenReturn(List.of(vozilo));
+        when(kompanijaRepository.findById(1L)).thenReturn(Optional.of(savedKompanija));
+        when(voziloRepository.findAllByKompanijaId(1L)).thenReturn(List.of(vozilo));
         when(voziloMapper.toResponse(vozilo)).thenReturn(new VoziloResponseDTO());
-        List<VoziloResponseDTO> all = voziloService.getAllVozilaForKompanija(vozilo.getKompanija().getId());
+        List<VoziloResponseDTO> all = voziloService.getAllVozilaForKompanija(1L);
         Assertions.assertThat(all).hasSize(1);
     }
 
@@ -118,6 +119,7 @@ public class VoziloServiceTest {
     @Test
     public void deleteVozilo_Success() {
         Vozilo vozilo = builderVozilo();
+        when(voziloRepository.findById(1L)).thenReturn(Optional.of(vozilo));
         voziloService.deleteVozilo(1L);
         verify(voziloRepository).deleteById(1L);
     }

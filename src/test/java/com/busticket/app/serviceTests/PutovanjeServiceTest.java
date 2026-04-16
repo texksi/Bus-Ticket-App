@@ -121,6 +121,7 @@ public class PutovanjeServiceTest {
     @Test
     public void deletePutovanje_Success(){
         Putovanje putovanje = builderPutovanje();
+        when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(putovanje));
         putovanjeService.deletePutovanje(1L);
         verify(putovanjeRepository).deleteById(1L);
     }
@@ -128,9 +129,10 @@ public class PutovanjeServiceTest {
     @Test
     public void getPutovanjaByKompanija_Success(){
         Putovanje putovanje = builderPutovanje();
-        when(putovanjeRepository.findAllByKompanijaId(putovanje.getKompanija().getId())).thenReturn(List.of(putovanje));
+        when(kompanijaRepository.findById(1L)).thenReturn(Optional.of(savedKompanija));
+        when(putovanjeRepository.findAllByKompanijaId(1L)).thenReturn(List.of(putovanje));
         when(putovanjeMapper.toResponse(putovanje)).thenReturn(new PutovanjeResponseDTO());
-        List<PutovanjeResponseDTO> all = putovanjeService.getPutovanjaByKompanija(putovanje.getKompanija().getId());
+        List<PutovanjeResponseDTO> all = putovanjeService.getPutovanjaByKompanija(1L);
         Assertions.assertThat(all).hasSize(1);
     }
 

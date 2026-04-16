@@ -77,18 +77,20 @@ public class OcenaServiceTest {
     @Test
     public void getOceneByKorisnik_Success(){
         Ocena ocena = builderOcena();
-        when(ocenaRepository.findAllByKorisnikId(ocena.getKorisnik().getId())).thenReturn(List.of(ocena));
+        when(korisnikRepository.findById(1L)).thenReturn(Optional.of(savedKorisnik));
+        when(ocenaRepository.findAllByKorisnikId(1L)).thenReturn(List.of(ocena));
         when(ocenaMapper.toResponse(ocena)).thenReturn(new OcenaResponseDTO());
-        List<OcenaResponseDTO> all = ocenaService.getOceneByKorisnik(ocena.getKorisnik().getId());
+        List<OcenaResponseDTO> all = ocenaService.getOceneByKorisnik(1L);
         Assertions.assertThat(all).hasSize(1);
     }
 
     @Test
     public void getOceneForPutovanje_Success(){
         Ocena ocena = builderOcena();
-        when(ocenaRepository.findAllByPutovanjeId(ocena.getPutovanje().getId())).thenReturn(List.of(ocena));
+        when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(savedPutovanje));
+        when(ocenaRepository.findAllByPutovanjeId(1L)).thenReturn(List.of(ocena));
         when(ocenaMapper.toResponse(ocena)).thenReturn(new OcenaResponseDTO());
-        List<OcenaResponseDTO> all = ocenaService.getOceneForPutovanje(ocena.getPutovanje().getId());
+        List<OcenaResponseDTO> all = ocenaService.getOceneForPutovanje(1L);
         Assertions.assertThat(all).hasSize(1);
     }
 
@@ -118,6 +120,8 @@ public class OcenaServiceTest {
                 .korisnikId(1L)
                 .putovanjeId(1L)
                 .build();
+        when(korisnikRepository.findById(1L)).thenReturn(Optional.of(savedKorisnik));
+        when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(savedPutovanje));
         when(ocenaRepository.existsByKorisnikIdAndPutovanjeId(ocenaRequestDTO.getKorisnikId(),ocenaRequestDTO.getPutovanjeId()))
                 .thenReturn(true);
         Assertions.assertThatThrownBy(() -> ocenaService.createOcena(ocenaRequestDTO))
@@ -128,6 +132,7 @@ public class OcenaServiceTest {
     @Test
     public void deleteOcena_Success(){
         Ocena ocena = builderOcena();
+        when(ocenaRepository.findById(1L)).thenReturn(Optional.of(ocena));
         ocenaService.deleteOcena(1L);
         verify(ocenaRepository).deleteById(1L);
     }
