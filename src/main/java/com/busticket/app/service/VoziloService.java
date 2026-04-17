@@ -77,10 +77,10 @@ public class VoziloService {
         if (voziloRepository.existsByRegistracija(newVozilo.getRegistracija())) {
             throw new EntityAlreadyExistsException("Vozilo sa ovom registracijom vec postoji");
         }
-        Vozilo vozilo = voziloMapper.toEntity(newVozilo);
         Kompanija kompanija = kompanijaRepository.findById(newVozilo.getKompanijaId()).orElseThrow(
                 () -> new EntityNotFoundException("Kompanija nije pronadjena")
         );
+        Vozilo vozilo = voziloMapper.toEntity(newVozilo);
         vozilo.setKompanija(kompanija);
         Vozilo saved = voziloRepository.save(vozilo);
         return voziloMapper.toResponse(saved);
