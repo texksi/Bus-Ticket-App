@@ -49,7 +49,8 @@ public class KorisnikService {
      * sa porukom "Korisnik ne postoji"
      */
     public KorisnikResponseDTO getKorisnikByUsername(String username) {
-        Korisnik korisnik = korisnikRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("Korisnik ne postoji"));
+        Korisnik korisnik = korisnikRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException("Korisnik ne postoji"));
         return korisnikMapper.toResponse(korisnik);
     }
 

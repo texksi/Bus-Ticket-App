@@ -1,6 +1,7 @@
 package com.busticket.app.serviceTests;
 
 import com.busticket.app.exceptions.EntityAlreadyExistsException;
+import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.OcenaMapper;
 import com.busticket.app.model.dto.RequestDTOs.OcenaRequestDTO;
 import com.busticket.app.model.dto.ResponseDTOs.OcenaResponseDTO;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -85,6 +87,14 @@ public class OcenaServiceTest {
     }
 
     @Test
+    public void getOceneByKorisnik_ThrowsExceptionWhenKorisnikNotFound(){
+        when(korisnikRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> ocenaService.getOceneByKorisnik(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Korisnik ne postoji");
+    }
+
+    @Test
     public void getOceneForPutovanje_Success(){
         Ocena ocena = builderOcena();
         when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(savedPutovanje));
@@ -92,6 +102,14 @@ public class OcenaServiceTest {
         when(ocenaMapper.toResponse(ocena)).thenReturn(new OcenaResponseDTO());
         List<OcenaResponseDTO> all = ocenaService.getOceneForPutovanje(1L);
         Assertions.assertThat(all).hasSize(1);
+    }
+
+    @Test
+    public void getOceneForPutovanje_ThrowsExceptionWhenPutovanjeNotFound(){
+        when(putovanjeRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> ocenaService.getOceneForPutovanje(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Putovanje nije pronadjeno");
     }
 
     @Test
@@ -109,6 +127,7 @@ public class OcenaServiceTest {
         when(ocenaRepository.save(ocena)).thenReturn(ocena);
         when(ocenaMapper.toResponse(ocena)).thenReturn(new OcenaResponseDTO());
         OcenaResponseDTO saved = ocenaService.createOcena(ocenaRequestDTO);
+        verify(ocenaRepository).save(any());
         Assertions.assertThat(saved).isNotNull();
     }
 
@@ -120,6 +139,7 @@ public class OcenaServiceTest {
                 .korisnikId(1L)
                 .putovanjeId(1L)
                 .build();
+        when(ocenaMapper.toEntity(ocenaRequestDTO)).thenReturn(builderOcena());
         when(korisnikRepository.findById(1L)).thenReturn(Optional.of(savedKorisnik));
         when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(savedPutovanje));
         when(ocenaRepository.existsByKorisnikIdAndPutovanjeId(ocenaRequestDTO.getKorisnikId(),ocenaRequestDTO.getPutovanjeId()))
@@ -130,10 +150,41 @@ public class OcenaServiceTest {
     }
 
     @Test
+    public void createOcena_ThrowsExceptionWhenKorisnikNotFound(){
+        OcenaRequestDTO request = new OcenaRequestDTO();
+        request.setKorisnikId(1L);
+        request.setPutovanjeId(1L);
+        when(korisnikRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> ocenaService.createOcena(request))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Korisnik ne postoji");
+    }
+
+    @Test
+    public void createOcena_ThrowsExceptionWhenPutovanjeNotFound(){
+        OcenaRequestDTO request = new OcenaRequestDTO();
+        request.setKorisnikId(1L);
+        request.setPutovanjeId(1L);
+        when(korisnikRepository.findById(1L)).thenReturn(Optional.of(savedKorisnik));
+        when(putovanjeRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> ocenaService.createOcena(request))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Putovanje nije pronadjeno");
+    }
+
+    @Test
     public void deleteOcena_Success(){
         Ocena ocena = builderOcena();
         when(ocenaRepository.findById(1L)).thenReturn(Optional.of(ocena));
         ocenaService.deleteOcena(1L);
         verify(ocenaRepository).deleteById(1L);
+    }
+
+    @Test
+    public void deleteOcene_ThrowsExceptionWhenOcenaNotFound(){
+        when(ocenaRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> ocenaService.deleteOcena(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Ocena nije pronadjena");
     }
 }

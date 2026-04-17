@@ -1,5 +1,6 @@
 package com.busticket.app.serviceTests;
 
+import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.RezervacijaMapper;
 import com.busticket.app.model.dto.RequestDTOs.RezervacijaRequestDTO;
 import com.busticket.app.model.dto.ResponseDTOs.RezervacijaResponseDTO;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -68,6 +70,14 @@ public class RezervacijaServiceTest {
     }
 
     @Test
+    public void getRezervacijaById_ThrowsExceptionWhenNotFound(){
+        when(rezervacijaRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> rezervacijaService.getRezervacijaById(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Rezervacija nije pronadjena");
+    }
+
+    @Test
     public void getAllRezervacije_Success(){
         Rezervacija rezervacija = builderRezervacija();
         when(rezervacijaRepository.findAll()).thenReturn(List.of(rezervacija));
@@ -85,12 +95,27 @@ public class RezervacijaServiceTest {
                 .korisnikId(1L)
                 .build();
         Rezervacija rezervacija = builderRezervacija();
-        when(rezervacijaMapper.toEntity(rezervacijaRequestDTO)).thenReturn(rezervacija);
         when(korisnikRepository.findById(1L)).thenReturn(Optional.of(savedKorisnik));
+        when(rezervacijaMapper.toEntity(rezervacijaRequestDTO)).thenReturn(rezervacija);
         when(rezervacijaRepository.save(rezervacija)).thenReturn(rezervacija);
         when(rezervacijaMapper.toResponse(rezervacija)).thenReturn(new RezervacijaResponseDTO());
         RezervacijaResponseDTO saved = rezervacijaService.createRezervacija(rezervacijaRequestDTO);
+        verify(rezervacijaRepository).save(any());
         Assertions.assertThat(saved).isNotNull();
+    }
+
+    @Test
+    public void createRezervacija_ThrowsExceptionWhenKorisnikNotFound(){
+        RezervacijaRequestDTO rezervacijaRequestDTO = RezervacijaRequestDTO.builder()
+                .ukupanIznos(100)
+                .nacinPlacanja("Kartica")
+                .status("pending")
+                .korisnikId(1L)
+                .build();
+        when(korisnikRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> rezervacijaService.createRezervacija(rezervacijaRequestDTO))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Korisnik ne postoji");
     }
 
     @Test
@@ -99,8 +124,18 @@ public class RezervacijaServiceTest {
         when(rezervacijaRepository.findById(1L)).thenReturn(Optional.of(rezervacija));
         when(rezervacijaRepository.save(rezervacija)).thenReturn(rezervacija);
         when(rezervacijaMapper.toResponse(rezervacija)).thenReturn(new RezervacijaResponseDTO());
-        RezervacijaResponseDTO updated = rezervacijaService.updateRezervacija(1L,"novi status","gotovina",100);
+        RezervacijaResponseDTO updated = rezervacijaService.updateRezervacija(1L,"novi status",
+                "gotovina",100);
         Assertions.assertThat(updated).isNotNull();
+    }
+
+    @Test
+    public void updateRezervacija_ThrowsExceptionWhenNotFound(){
+        when(rezervacijaRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> rezervacijaService.updateRezervacija(1L,"novi status",
+                "gotovina",100))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Rezervacija nije pronadjena");
     }
 
     @Test
@@ -112,6 +147,14 @@ public class RezervacijaServiceTest {
     }
 
     @Test
+    public void deleteRezervacija_ThrowsExceptionWhenNoutFound(){
+        when(rezervacijaRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> rezervacijaService.deleteRezervacija(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Rezervacija nije pronadjena");
+    }
+
+    @Test
     public void getRezervacijeByKorisnik_Success(){
         Rezervacija rezervacija = builderRezervacija();
         when(korisnikRepository.findById(1L)).thenReturn(Optional.of(savedKorisnik));
@@ -119,6 +162,14 @@ public class RezervacijaServiceTest {
         when(rezervacijaMapper.toResponse(rezervacija)).thenReturn(new RezervacijaResponseDTO());
         List<RezervacijaResponseDTO> all = rezervacijaService.getRezervacijeByKorisnik(1L);
         Assertions.assertThat(all).hasSize(1);
+    }
+
+    @Test
+    public void getRezervacijeByKorisnik_ThrowsExceptionWhenKorisnikNotFound(){
+        when(korisnikRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> rezervacijaService.getRezervacijeByKorisnik(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Korisnik ne postoji");
     }
 }
 

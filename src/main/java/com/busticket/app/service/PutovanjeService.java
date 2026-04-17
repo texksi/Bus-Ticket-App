@@ -68,13 +68,13 @@ public class PutovanjeService {
      *                                 porukom "Vozilo nije pronadjeno"/"Kompanija nije pronadjena"
      */
     public PutovanjeResponseDTO createPutovanje(PutovanjeRequestDTO newPutovanje) {
-        Putovanje putovanje = putovanjeMapper.toEntity(newPutovanje);
         Vozilo vozilo = voziloRepository.findById(newPutovanje.getVoziloId()).orElseThrow(
                 () -> new EntityNotFoundException("Vozilo nije pronadjeno")
         );
         Kompanija kompanija = kompanijaRepository.findById(newPutovanje.getKompanijaId()).orElseThrow(
                 () -> new EntityNotFoundException("Kompanija nije pronadjena")
         );
+        Putovanje putovanje = putovanjeMapper.toEntity(newPutovanje);
         putovanje.setVozilo(vozilo);
         putovanje.setKompanija(kompanija);
         Putovanje saved = putovanjeRepository.save(putovanje);

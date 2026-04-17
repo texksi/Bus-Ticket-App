@@ -1,5 +1,6 @@
 package com.busticket.app.serviceTests;
 
+import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.PlacanjeMapper;
 import com.busticket.app.model.dto.ResponseDTOs.PlacanjeResponseDTO;
 import com.busticket.app.model.entity.Placanje;
@@ -64,6 +65,14 @@ public class PlacanjeServiceTest {
     }
 
     @Test
+    public void getPlacanjeById_ThrowsExceptionWhenNotFound(){
+        when(placanjeRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> placanjeService.getPlacanjeById(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Placanje nije pronadjeno");
+    }
+
+    @Test
     public void getPlacanjaForRezervacija_Success(){
         Placanje placanje = builderPlacanje();
         when(rezervacijaRepository.findById(1L)).thenReturn(Optional.of(new Rezervacija()));
@@ -71,5 +80,13 @@ public class PlacanjeServiceTest {
         when(placanjeMapper.toResponse(placanje)).thenReturn(new PlacanjeResponseDTO());
         List<PlacanjeResponseDTO> all = placanjeService.getPlacanjaForRezervacija(1L);
         Assertions.assertThat(all).hasSize(1);
+    }
+
+    @Test
+    public void getPlacanjaForRezervacija_ThrowsExceptionWhenRezervacijaNotFound(){
+        when(rezervacijaRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> placanjeService.getPlacanjaForRezervacija(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Rezervacija nije pronadjena");
     }
 }

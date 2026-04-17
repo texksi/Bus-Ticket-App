@@ -1,6 +1,7 @@
 package com.busticket.app.serviceTests;
 
 import com.busticket.app.exceptions.EntityAlreadyExistsException;
+import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.KorisnikMapper;
 import com.busticket.app.model.dto.RequestDTOs.KorisnikRequestDTO;
 import com.busticket.app.model.dto.ResponseDTOs.KorisnikResponseDTO;
@@ -18,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,12 +54,28 @@ public class KorisnikServiceTest {
     }
 
     @Test
+    public void getKorisnikById_ThrowsExceptionWhenNotFound() {
+        when(korisnikRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> korisnikService.getKorisnikById(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Korisnik ne postoji");
+    }
+
+    @Test
     public void getKorisnikByUsername_Success() {
         Korisnik korisnik = builderKorisnik();
         when(korisnikRepository.findByUsername(korisnik.getUsername())).thenReturn(Optional.of(korisnik));
         when(korisnikMapper.toResponse(korisnik)).thenReturn(new KorisnikResponseDTO());
         KorisnikResponseDTO found = korisnikService.getKorisnikByUsername("username");
         Assertions.assertThat(found).isNotNull();
+    }
+
+    @Test
+    public void getKorisnikByUsername_ThrowsExceptionWhenNotFound() {
+        when(korisnikRepository.findByUsername("username")).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> korisnikService.getKorisnikByUsername("username"))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Korisnik ne postoji");
     }
 
     @Test
@@ -84,6 +102,7 @@ public class KorisnikServiceTest {
         when(korisnikMapper.toResponse(korisnik)).thenReturn(new KorisnikResponseDTO());
         when(korisnikMapper.toEntity(korisnikRequestDTO)).thenReturn(korisnik);
         KorisnikResponseDTO saved = korisnikService.createKorisnik(korisnikRequestDTO);
+        verify(korisnikRepository).save(any());
         Assertions.assertThat(saved).isNotNull();
     }
 
@@ -104,7 +123,7 @@ public class KorisnikServiceTest {
     }
 
     @Test
-    public void createKorisnik_ThrowsExceptionWhenUsernameExists(){
+    public void createKorisnik_ThrowsExceptionWhenUsernameExists() {
         KorisnikRequestDTO korisnikRequestDTO = KorisnikRequestDTO.builder()
                 .ime("KorisnikIme")
                 .prezime("KorisnikPrezime")
@@ -120,9 +139,8 @@ public class KorisnikServiceTest {
     }
 
     @Test
-    public void updateKorisnik_Success(){
+    public void updateKorisnik_Success() {
         Korisnik korisnik = builderKorisnik();
-        korisnik.setUsername("novi username");
         when(korisnikRepository.findById(1L)).thenReturn(Optional.of(korisnik));
         when(korisnikRepository.save(korisnik)).thenReturn(korisnik);
         when(korisnikMapper.toResponse(korisnik)).thenReturn(new KorisnikResponseDTO());
@@ -132,31 +150,53 @@ public class KorisnikServiceTest {
     }
 
     @Test
-    public void updateKorisnik_ThrowsExceptionWhenEmailExists(){
-        KorisnikRequestDTO korisnikRequestDTO = KorisnikRequestDTO.builder()
-                .ime("KorisnikIme")
-                .prezime("KorisnikPrezime")
-                .email("proba@email.com")
-                .username("username")
-                .password("test")
-                .role(Role.ADMIN)
-                .build();
+    public void updateKorisnik_ThrowsExceptionWhenNotFound() {
+        when(korisnikRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> korisnikService.updateKorisnik(
+                        1L, "novi username", "proba@email.com", "KorisnikIme",
+                        "KorisnikPrezime"))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Korisnik ne postoji");
+    }
+
+
+    @Test
+    public void updateKorisnik_ThrowsExceptionWhenEmailExists() {
         Korisnik korisnik = builderKorisnik();
         when(korisnikRepository.findById(1L)).thenReturn(Optional.of(korisnik));
-        when(korisnikRepository.existsByEmail(korisnikRequestDTO.getEmail())).thenReturn(true);
+        when(korisnikRepository.existsByEmail("proba@email.com")).thenReturn(true);
         Assertions.assertThatThrownBy(() -> korisnikService.updateKorisnik(
-                1L, "novi username", "proba@email.com", "KorisnikIme", "KorisnikPrezime"))
+                        1L, "novi username", "proba@email.com", "KorisnikIme", "KorisnikPrezime"))
                 .isInstanceOf(EntityAlreadyExistsException.class)
                 .hasMessage("Korisnik sa tim email-om ili username-om već postoji");
     }
 
     @Test
-    public void deleteKorisnik_Success(){
+    public void updateKorisnik_ThrowsExceptionWhenUsernameExists() {
+        Korisnik korisnik = builderKorisnik();
+        when(korisnikRepository.findById(1L)).thenReturn(Optional.of(korisnik));
+        when(korisnikRepository.existsByUsername("novi username")).thenReturn(true);
+        Assertions.assertThatThrownBy(() -> korisnikService.updateKorisnik(
+                        1L, "novi username", "proba@email.com", "KorisnikIme", "KorisnikPrezime"))
+                .isInstanceOf(EntityAlreadyExistsException.class)
+                .hasMessage("Korisnik sa tim email-om ili username-om već postoji");
+    }
+
+    @Test
+    public void deleteKorisnik_Success() {
         Korisnik korisnik = builderKorisnik();
         when(korisnikRepository.findById(1L)).thenReturn(Optional.of(korisnik));
         korisnikService.deleteKorisnik(1L);
         verify(korisnikRepository).deleteById(1L);
 
+    }
+
+    @Test
+    public void deleteKorisnik_ThrowsExceptionWhenNotFound() {
+        when(korisnikRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> korisnikService.deleteKorisnik(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Korisnik ne postoji");
     }
 
 }
