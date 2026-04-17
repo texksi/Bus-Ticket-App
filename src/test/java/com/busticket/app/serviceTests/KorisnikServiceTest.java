@@ -153,6 +153,7 @@ public class KorisnikServiceTest {
     @Test
     public void deleteKorisnik_Success(){
         Korisnik korisnik = builderKorisnik();
+        when(korisnikRepository.findById(1L)).thenReturn(Optional.of(korisnik));
         korisnikService.deleteKorisnik(1L);
         verify(korisnikRepository).deleteById(1L);
 

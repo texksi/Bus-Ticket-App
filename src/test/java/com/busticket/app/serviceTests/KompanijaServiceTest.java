@@ -81,6 +81,7 @@ public class KompanijaServiceTest {
     @Test
     public void deleteKompanija_Success(){
         Kompanija kompanija = builderKompanija();
+        when(kompanijaRepository.findById(1L)).thenReturn(Optional.of(kompanija));
         kompanijaService.deleteKompanija(1L);
         verify(kompanijaRepository).deleteById(1L);
     }

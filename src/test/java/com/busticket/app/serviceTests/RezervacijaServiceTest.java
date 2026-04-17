@@ -106,6 +106,7 @@ public class RezervacijaServiceTest {
     @Test
     public void deleteRezervacija_Success(){
         Rezervacija rezervacija = builderRezervacija();
+        when(rezervacijaRepository.findById(1L)).thenReturn(Optional.of(rezervacija));
         rezervacijaService.deleteRezervacija(1L);
         verify(rezervacijaRepository).deleteById(1L);
     }
@@ -113,9 +114,10 @@ public class RezervacijaServiceTest {
     @Test
     public void getRezervacijeByKorisnik_Success(){
         Rezervacija rezervacija = builderRezervacija();
-        when(rezervacijaRepository.findAllByKorisnikId(rezervacija.getKorisnik().getId())).thenReturn(List.of(rezervacija));
+        when(korisnikRepository.findById(1L)).thenReturn(Optional.of(savedKorisnik));
+        when(rezervacijaRepository.findAllByKorisnikId(1L)).thenReturn(List.of(rezervacija));
         when(rezervacijaMapper.toResponse(rezervacija)).thenReturn(new RezervacijaResponseDTO());
-        List<RezervacijaResponseDTO> all = rezervacijaService.getRezervacijeByKorisnik(rezervacija.getKorisnik().getId());
+        List<RezervacijaResponseDTO> all = rezervacijaService.getRezervacijeByKorisnik(1L);
         Assertions.assertThat(all).hasSize(1);
     }
 }

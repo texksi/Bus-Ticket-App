@@ -132,6 +132,7 @@ public class KartaServiceTest {
     @Test
     public void deleteKarta_Success() {
         Karta karta = builderKarta();
+        when(kartaRepository.findById(1L)).thenReturn(Optional.of(karta));
         kartaService.deleteKarta(1L);
         verify(kartaRepository).deleteById(1L);
     }
@@ -139,18 +140,20 @@ public class KartaServiceTest {
     @Test
     public void getAllKarteForPutovanje_Success() {
         Karta karta = builderKarta();
-        when(kartaRepository.findAllByPutovanjeId(karta.getPutovanje().getId())).thenReturn(List.of(karta));
+        when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(savedPutovanje));
+        when(kartaRepository.findAllByPutovanjeId(1L)).thenReturn(List.of(karta));
         when(kartaMapper.toResponse(karta)).thenReturn(new KartaResponseDTO());
-        List<KartaResponseDTO> all = kartaService.getAllKarteForPutovanje(karta.getPutovanje().getId());
+        List<KartaResponseDTO> all = kartaService.getAllKarteForPutovanje(1L);
         Assertions.assertThat(all).hasSize(1);
     }
 
     @Test
     public void getAllKarteForRezervacija_Success() {
         Karta karta = builderKarta();
-        when(kartaRepository.findAllByRezervacijaId(karta.getRezervacija().getId())).thenReturn(List.of(karta));
+        when(rezervacijaRepository.findById(1L)).thenReturn(Optional.of(savedRezervacija));
+        when(kartaRepository.findAllByRezervacijaId(1L)).thenReturn(List.of(karta));
         when(kartaMapper.toResponse(karta)).thenReturn(new KartaResponseDTO());
-        List<KartaResponseDTO> all = kartaService.getAllKarteForRezervacija(karta.getRezervacija().getId());
+        List<KartaResponseDTO> all = kartaService.getAllKarteForRezervacija(1L);
         Assertions.assertThat(all).hasSize(1);
     }
 }
