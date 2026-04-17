@@ -7,6 +7,10 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entitet koji sadrzi osnovne podatke o korisniku kao sto su ime, prezime, email, username i lozinka,
+ * ulogu korisnika u sistemu i listu ocena koje je korisnik dao.
+ */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,22 +21,46 @@ import java.util.List;
 @Table(name = "korisnik")
 public class Korisnik {
 
+    /**
+     * Jedinstveni identifikator korisnika, automatski se generise u bazi podataka
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "ime",nullable = false)
+    /**
+     * Ime korisnika
+     */
+    @Column(name = "ime", nullable = false)
     private String ime;
-    @Column(name = "prezime",nullable = false)
+    /**
+     * Prezime korisnika
+     */
+    @Column(name = "prezime", nullable = false)
     private String prezime;
-    @Column(name = "email",nullable = false, unique = true)
+    /**
+     * Email adresa korisnika, mora biti jedinstvena
+     */
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
-    @Column(name = "username",nullable = false, unique = true)
+    /**
+     * Korisnicko ime korisnika, mora biti jedinstveno
+     */
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
-    @Column(name = "password",nullable = false)
+    /**
+     * Lozinka korisnika
+     */
+    @Column(name = "password", nullable = false)
     private String password;
+    /**
+     * Uloga korisnika, moze biti USER ili ADMIN
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
+    /**
+     * Lista ocena koje je korisnik dao za putovanja
+     */
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "korisnik")
     @Builder.Default
     private List<Ocena> ocene = new ArrayList<>();
