@@ -64,9 +64,9 @@ public class RezervacijaService {
      * baca se custom exception sa porukom "Korisnik ne postoji"
      */
     public RezervacijaResponseDTO createRezervacija(RezervacijaRequestDTO newRezervacija){
-        Rezervacija rezervacija = rezervacijaMapper.toEntity(newRezervacija);
         Korisnik korisnik = korisnikRepository.findById(newRezervacija.getKorisnikId())
                 .orElseThrow(() -> new EntityNotFoundException("Korisnik ne postoji"));
+        Rezervacija rezervacija = rezervacijaMapper.toEntity(newRezervacija);
         rezervacija.setKorisnik(korisnik);
         return rezervacijaMapper.toResponse(rezervacijaRepository.save(rezervacija));
     }
