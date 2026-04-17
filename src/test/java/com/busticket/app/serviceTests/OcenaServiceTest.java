@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -126,6 +127,7 @@ public class OcenaServiceTest {
         when(ocenaRepository.save(ocena)).thenReturn(ocena);
         when(ocenaMapper.toResponse(ocena)).thenReturn(new OcenaResponseDTO());
         OcenaResponseDTO saved = ocenaService.createOcena(ocenaRequestDTO);
+        verify(ocenaRepository).save(any());
         Assertions.assertThat(saved).isNotNull();
     }
 
@@ -137,6 +139,7 @@ public class OcenaServiceTest {
                 .korisnikId(1L)
                 .putovanjeId(1L)
                 .build();
+        when(ocenaMapper.toEntity(ocenaRequestDTO)).thenReturn(builderOcena());
         when(korisnikRepository.findById(1L)).thenReturn(Optional.of(savedKorisnik));
         when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(savedPutovanje));
         when(ocenaRepository.existsByKorisnikIdAndPutovanjeId(ocenaRequestDTO.getKorisnikId(),ocenaRequestDTO.getPutovanjeId()))
@@ -154,7 +157,7 @@ public class OcenaServiceTest {
         when(korisnikRepository.findById(1L)).thenReturn(Optional.empty());
         Assertions.assertThatThrownBy(() -> ocenaService.createOcena(request))
                 .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage("Korisnik nije pronadjeno");
+                .hasMessage("Korisnik ne postoji");
     }
 
     @Test

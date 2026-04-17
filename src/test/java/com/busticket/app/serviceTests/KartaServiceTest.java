@@ -1,5 +1,6 @@
 package com.busticket.app.serviceTests;
 
+import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.KartaMapper;
 import com.busticket.app.model.dto.RequestDTOs.KartaRequestDTO;
 import com.busticket.app.model.dto.ResponseDTOs.KartaResponseDTO;
@@ -92,6 +93,14 @@ public class KartaServiceTest {
     }
 
     @Test
+    public void getKartaById_ThrowsExceptionWhenNotFound() {
+        when(kartaRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> kartaService.getKartaById(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Karta nije pronadjena");
+    }
+
+    @Test
     public void getAllKarte_Success() {
         Karta karta = builderKarta();
         when(kartaRepository.findAll()).thenReturn(List.of(karta));
@@ -116,7 +125,44 @@ public class KartaServiceTest {
         when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(savedPutovanje));
         when(kartaMapper.toResponse(karta)).thenReturn(new KartaResponseDTO());
         KartaResponseDTO saved = kartaService.createKarta(request);
+        verify(kartaRepository).save(any());
         Assertions.assertThat(saved).isNotNull();
+    }
+
+    @Test
+    public void createKarta_ThrowsRezervacijaNotFound() {
+        KartaRequestDTO request = KartaRequestDTO.builder()
+                .brojSedista("W1")
+                .osnovnaCena(100)
+                .tip("regular")
+                .rezervacijaId(1L)
+                .putovanjeId(1L)
+                .build();
+        Karta karta = builderKarta();
+        when(kartaMapper.toEntity(request)).thenReturn(karta);
+        when(rezervacijaRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> kartaService.createKarta(request))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Rezervacija nije pronadjena");
+
+    }
+
+    @Test
+    public void createKarta_ThrowsPutovanjeNotFound(){
+        KartaRequestDTO request = KartaRequestDTO.builder()
+                .brojSedista("W1")
+                .osnovnaCena(100)
+                .tip("regular")
+                .rezervacijaId(1L)
+                .putovanjeId(1L)
+                .build();
+        Karta karta = builderKarta();
+        when(kartaMapper.toEntity(request)).thenReturn(karta);
+        when(rezervacijaRepository.findById(1L)).thenReturn(Optional.of(savedRezervacija));
+        when(putovanjeRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> kartaService.createKarta(request))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Putovanje nije pronadjeno");
     }
 
     @Test
@@ -130,11 +176,27 @@ public class KartaServiceTest {
     }
 
     @Test
+    public void updateKarta_ThrowsExceptionWhenNotFound() {
+        when(kartaRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> kartaService.updateKarta(1L, "2ad", "regular"))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Karta nije pronadjena");
+    }
+
+    @Test
     public void deleteKarta_Success() {
         Karta karta = builderKarta();
         when(kartaRepository.findById(1L)).thenReturn(Optional.of(karta));
         kartaService.deleteKarta(1L);
         verify(kartaRepository).deleteById(1L);
+    }
+
+    @Test
+    public void deleteKarta_ThrowsExceptionWhenNotFound() {
+        when(kartaRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> kartaService.deleteKarta(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Karta nije pronadjena");
     }
 
     @Test
@@ -148,6 +210,14 @@ public class KartaServiceTest {
     }
 
     @Test
+    public void getAllKarteForPutovanje_ThrowsExceptionWhenPutovanjeNotFound(){
+        when(putovanjeRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> kartaService.getAllKarteForPutovanje(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Putovanje nije pronadjeno");
+    }
+
+    @Test
     public void getAllKarteForRezervacija_Success() {
         Karta karta = builderKarta();
         when(rezervacijaRepository.findById(1L)).thenReturn(Optional.of(savedRezervacija));
@@ -155,5 +225,13 @@ public class KartaServiceTest {
         when(kartaMapper.toResponse(karta)).thenReturn(new KartaResponseDTO());
         List<KartaResponseDTO> all = kartaService.getAllKarteForRezervacija(1L);
         Assertions.assertThat(all).hasSize(1);
+    }
+
+    @Test
+    public void getAllKarteForRezervacija_ThrowsExceptionWhenRezervacijaNotFound(){
+        when(rezervacijaRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> kartaService.getAllKarteForRezervacija(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Rezervacija nije pronadjena");
     }
 }

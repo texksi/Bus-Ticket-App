@@ -81,7 +81,7 @@ public class OcenaService {
      */
     public OcenaResponseDTO createOcena(OcenaRequestDTO newOcena) {
         Korisnik korisnik = korisnikRepository.findById(newOcena.getKorisnikId()).orElseThrow(
-                () -> new EntityNotFoundException("Korisnik nije pronadjeno")
+                () -> new EntityNotFoundException("Korisnik ne postoji")
         );
         Putovanje putovanje = putovanjeRepository.findById(newOcena.getPutovanjeId()).orElseThrow(
                 () -> new EntityNotFoundException("Putovanje nije pronadjeno")
