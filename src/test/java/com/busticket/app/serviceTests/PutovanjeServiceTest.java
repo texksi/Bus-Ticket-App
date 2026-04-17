@@ -1,5 +1,6 @@
 package com.busticket.app.serviceTests;
 
+import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.PutovanjeMapper;
 import com.busticket.app.model.dto.RequestDTOs.PutovanjeRequestDTO;
 import com.busticket.app.model.dto.ResponseDTOs.PutovanjeResponseDTO;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,7 +43,7 @@ public class PutovanjeServiceTest {
     private Vozilo savedVozilo;
     private Kompanija savedKompanija;
 
-    private Putovanje builderPutovanje(){
+    private Putovanje builderPutovanje() {
         return Putovanje.builder()
                 .polaziste("polaziste")
                 .odrediste("odrediste")
@@ -54,7 +56,7 @@ public class PutovanjeServiceTest {
     }
 
     @BeforeEach
-    public void setup(){
+    public void setup() {
         savedKompanija = Kompanija.builder()
                 .naziv("Kompanija")
                 .kontakt("email@gmail.com")
@@ -69,7 +71,7 @@ public class PutovanjeServiceTest {
     }
 
     @Test
-    public void getPutovanjeById_Success(){
+    public void getPutovanjeById_Success() {
         Putovanje putovanje = builderPutovanje();
         when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(putovanje));
         when(putovanjeMapper.toResponse(putovanje)).thenReturn(new PutovanjeResponseDTO());
@@ -78,7 +80,15 @@ public class PutovanjeServiceTest {
     }
 
     @Test
-    public void getAllPutovanja_Success(){
+    public void getPutovanjeById_ThrowsExceptionWhenNotFound() {
+        when(putovanjeRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> putovanjeService.getPutovanjeById(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Putovanje nije pronadjeno");
+    }
+
+    @Test
+    public void getAllPutovanja_Success() {
         Putovanje putovanje = builderPutovanje();
         when(putovanjeRepository.findAll()).thenReturn(List.of(putovanje));
         when(putovanjeMapper.toResponse(putovanje)).thenReturn(new PutovanjeResponseDTO());
@@ -87,7 +97,7 @@ public class PutovanjeServiceTest {
     }
 
     @Test
-    public void createPutovanje_Success(){
+    public void createPutovanje_Success() {
         PutovanjeRequestDTO putovanjeRequestDTO = PutovanjeRequestDTO.builder()
                 .polaziste("polaziste")
                 .odrediste("odrediste")
@@ -98,28 +108,73 @@ public class PutovanjeServiceTest {
                 .voziloId(1L)
                 .build();
         Putovanje putovanje = builderPutovanje();
-        when(putovanjeMapper.toEntity(putovanjeRequestDTO)).thenReturn(putovanje);
         when(voziloRepository.findById(1L)).thenReturn(Optional.of(savedVozilo));
         when(kompanijaRepository.findById(1L)).thenReturn(Optional.of(savedKompanija));
+        when(putovanjeMapper.toEntity(putovanjeRequestDTO)).thenReturn(putovanje);
         when(putovanjeRepository.save(putovanje)).thenReturn(putovanje);
         when(putovanjeMapper.toResponse(putovanje)).thenReturn(new PutovanjeResponseDTO());
         PutovanjeResponseDTO saved = putovanjeService.createPutovanje(putovanjeRequestDTO);
+        verify(putovanjeRepository).save(any());
         Assertions.assertThat(saved).isNotNull();
     }
 
     @Test
-    public void updatePutovanje_Success(){
+    public void createPutovanje_ThrowsExceptionWhenVoziloNotFound() {
+        PutovanjeRequestDTO putovanjeRequestDTO = PutovanjeRequestDTO.builder()
+                .polaziste("polaziste")
+                .odrediste("odrediste")
+                .vremePolaska(LocalDateTime.now())
+                .vremeDolaska(LocalDateTime.now().plusDays(4))
+                .osnovnaCena(100)
+                .kompanijaId(1L)
+                .voziloId(1L)
+                .build();
+        when(voziloRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> putovanjeService.createPutovanje(putovanjeRequestDTO))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Vozilo nije pronadjeno");
+    }
+
+    @Test
+    public void createPutovanje_ThrowsExceptionWhenKompanijaNotFound() {
+        PutovanjeRequestDTO putovanjeRequestDTO = PutovanjeRequestDTO.builder()
+                .polaziste("polaziste")
+                .odrediste("odrediste")
+                .vremePolaska(LocalDateTime.now())
+                .vremeDolaska(LocalDateTime.now().plusDays(4))
+                .osnovnaCena(100)
+                .kompanijaId(1L)
+                .voziloId(1L)
+                .build();
+        when(voziloRepository.findById(1L)).thenReturn(Optional.of(savedVozilo));
+        when(kompanijaRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> putovanjeService.createPutovanje(putovanjeRequestDTO))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Kompanija nije pronadjena");
+    }
+
+    @Test
+    public void updatePutovanje_Success() {
         Putovanje putovanje = builderPutovanje();
         when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(putovanje));
         when(putovanjeRepository.save(putovanje)).thenReturn(putovanje);
         when(putovanjeMapper.toResponse(putovanje)).thenReturn(new PutovanjeResponseDTO());
-        PutovanjeResponseDTO updated = putovanjeService.updatePutovanje(1L,"polaziste2","odredostr2",
-                LocalDateTime.now().plusDays(2),LocalDateTime.now().plusDays(5),100);
+        PutovanjeResponseDTO updated = putovanjeService.updatePutovanje(1L, "polaziste2", "odredostr2",
+                LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(5), 100);
         Assertions.assertThat(updated).isNotNull();
     }
 
     @Test
-    public void deletePutovanje_Success(){
+    public void updatePutovanje_ThrowsExceptionWhenNotFound() {
+        when(putovanjeRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> putovanjeService.updatePutovanje(1L, "polaziste2", "odredostr2",
+                        LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(5), 100))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Putovanje nije pronadjeno");
+    }
+
+    @Test
+    public void deletePutovanje_Success() {
         Putovanje putovanje = builderPutovanje();
         when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(putovanje));
         putovanjeService.deletePutovanje(1L);
@@ -127,13 +182,29 @@ public class PutovanjeServiceTest {
     }
 
     @Test
-    public void getPutovanjaByKompanija_Success(){
+    public void deletePutovanje_ThrowsExceptionWhenNotFound() {
+        when(putovanjeRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> putovanjeService.deletePutovanje(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Putovanje nije pronadjeno");
+    }
+
+    @Test
+    public void getPutovanjaByKompanija_Success() {
         Putovanje putovanje = builderPutovanje();
         when(kompanijaRepository.findById(1L)).thenReturn(Optional.of(savedKompanija));
         when(putovanjeRepository.findAllByKompanijaId(1L)).thenReturn(List.of(putovanje));
         when(putovanjeMapper.toResponse(putovanje)).thenReturn(new PutovanjeResponseDTO());
         List<PutovanjeResponseDTO> all = putovanjeService.getPutovanjaByKompanija(1L);
         Assertions.assertThat(all).hasSize(1);
+    }
+
+    @Test
+    public void getPutovanjaByKompanija_ThrowsExceptionWhenKompanijaNotFound() {
+        when(kompanijaRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThatThrownBy(() -> putovanjeService.getPutovanjaByKompanija(1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Kompanija nije pronadjena");
     }
 
 }
