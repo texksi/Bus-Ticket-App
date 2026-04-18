@@ -165,8 +165,8 @@ public class VoziloServiceTest {
     public void updateVozilo_ThrowsExceptionWhenRegistracijaExists(){
         Vozilo vozilo = builderVozilo();
         when(voziloRepository.findById(1L)).thenReturn(Optional.of(vozilo));
-        when(voziloRepository.existsByRegistracija(vozilo.getRegistracija())).thenReturn(true);
-        Assertions.assertThatThrownBy(() -> voziloService.updateVozilo(1L, 40, "bg334", 10, 4))
+        when(voziloRepository.existsByRegistracija("novaReg")).thenReturn(true);
+        Assertions.assertThatThrownBy(() -> voziloService.updateVozilo(1L, 40, "novaReg", 10, 4))
                 .isInstanceOf(EntityAlreadyExistsException.class)
                 .hasMessage("Vozilo sa ovom registracijom vec postoji");
     }

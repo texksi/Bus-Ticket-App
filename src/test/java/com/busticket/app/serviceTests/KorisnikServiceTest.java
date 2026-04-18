@@ -164,11 +164,11 @@ public class KorisnikServiceTest {
     public void updateKorisnik_ThrowsExceptionWhenEmailExists() {
         Korisnik korisnik = builderKorisnik();
         when(korisnikRepository.findById(1L)).thenReturn(Optional.of(korisnik));
-        when(korisnikRepository.existsByEmail("proba@email.com")).thenReturn(true);
+        when(korisnikRepository.existsByEmail("novi@email.com")).thenReturn(true);
         Assertions.assertThatThrownBy(() -> korisnikService.updateKorisnik(
-                        1L, "novi username", "proba@email.com", "KorisnikIme", "KorisnikPrezime"))
+                        1L, "username", "novi@email.com", "KorisnikIme", "KorisnikPrezime"))
                 .isInstanceOf(EntityAlreadyExistsException.class)
-                .hasMessage("Korisnik sa tim email-om ili username-om već postoji");
+                .hasMessage("Korisnik sa tim email-om već postoji");
     }
 
     @Test
@@ -179,7 +179,7 @@ public class KorisnikServiceTest {
         Assertions.assertThatThrownBy(() -> korisnikService.updateKorisnik(
                         1L, "novi username", "proba@email.com", "KorisnikIme", "KorisnikPrezime"))
                 .isInstanceOf(EntityAlreadyExistsException.class)
-                .hasMessage("Korisnik sa tim email-om ili username-om već postoji");
+                .hasMessage("Korisnik sa tim username-om već postoji");
     }
 
     @Test

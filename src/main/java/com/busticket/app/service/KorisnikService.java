@@ -103,10 +103,11 @@ public class KorisnikService {
     public KorisnikResponseDTO updateKorisnik(Long id, String username, String email, String ime, String prezime) {
         Korisnik savedKorisnik = korisnikRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Korisnik ne postoji"));
-        if (!savedKorisnik.getUsername().equals(username) || !savedKorisnik.getEmail().equals(email)) {
-            if (korisnikRepository.existsByEmail(email) || korisnikRepository.existsByUsername(username)) {
-                throw new EntityAlreadyExistsException("Korisnik sa tim email-om ili username-om već postoji");
-            }
+        if (!savedKorisnik.getUsername().equals(username) && korisnikRepository.existsByUsername(username)) {
+            throw new EntityAlreadyExistsException("Korisnik sa tim username-om već postoji");
+        }
+        if (!savedKorisnik.getEmail().equals(email) && korisnikRepository.existsByEmail(email)) {
+            throw new EntityAlreadyExistsException("Korisnik sa tim email-om već postoji");
         }
         savedKorisnik.setIme(ime);
         savedKorisnik.setPrezime(prezime);

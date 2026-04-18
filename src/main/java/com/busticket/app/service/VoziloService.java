@@ -107,7 +107,7 @@ public class VoziloService {
         Vozilo savedVozilo = voziloRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Vozilo nije pronadjeno")
         );
-        if (voziloRepository.existsByRegistracija(registracija)) {
+        if (!savedVozilo.getRegistracija().equals(registracija) && voziloRepository.existsByRegistracija(registracija)) {
             throw new EntityAlreadyExistsException("Vozilo sa ovom registracijom vec postoji");
         }
         savedVozilo.setKapacitet(kapacitet);
