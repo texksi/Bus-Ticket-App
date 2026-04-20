@@ -1,6 +1,8 @@
 package com.busticket.app.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -29,11 +31,13 @@ public class Karta {
      * Broj sedista na karti
      */
     @Column(name = "broj_sedista", nullable = false)
+    @NotBlank
     private String brojSedista;
     /**
      * Osnovna cena karte
      */
     @Column(name = "osnovna_cena", nullable = false)
+    @Positive
     private double osnovnaCena;
     /**
      * Datum i vreme izdavanja karte
@@ -45,6 +49,7 @@ public class Karta {
      * Tip karte (student,regular...)
      */
     @Column(name = "tip", nullable = false)
+    @NotBlank
     private String tip;
     /**
      * Rezervacija za koju je karta izdata
