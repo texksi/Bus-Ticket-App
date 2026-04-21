@@ -1,6 +1,8 @@
 package com.busticket.app.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -37,16 +39,19 @@ public class Rezervacija {
      * Ukupan iznos rezervacije
      */
     @Column(name = "ukupan_iznos", nullable = false)
+    @Positive
     private double ukupanIznos;
     /**
      * Nacin placanja
      */
     @Column(name = "nacin_placanja", nullable = false)
+    @NotBlank
     private String nacinPlacanja;
     /**
      * Status rezervacije
      */
     @Column(name = "status", nullable = false)
+    @NotBlank
     private String status;
     /**
      * Korisnik koji je napravio rezervaciju
