@@ -1,6 +1,8 @@
 package com.busticket.app.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 /**
@@ -29,11 +31,13 @@ public class Ocena {
      * Komentar korisnika
      */
     @Column(name = "komentar", nullable = false)
+    @NotBlank
     private String komentar;
     /**
      * Numericka ocena
      */
     @Column(name = "ocena", nullable = false)
+    @Positive
     private int ocena;
     /**
      * Korisnik koji je dao ocenu

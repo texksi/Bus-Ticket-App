@@ -1,6 +1,7 @@
 package com.busticket.app.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -30,11 +31,13 @@ public class Kompanija {
      * Naziv kompanije
      */
     @Column(name = "naziv", nullable = false)
+    @NotBlank
     private String naziv;
     /**
      * Kontakt kompanije
      */
     @Column(name = "kontakt", nullable = false)
+    @NotBlank
     private String kontakt;
 
     /**

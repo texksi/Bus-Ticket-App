@@ -1,6 +1,8 @@
 package com.busticket.app.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -31,11 +33,13 @@ public class Putovanje {
      * Mesto polaska putovanja
      */
     @Column(name = "polaziste", nullable = false)
+    @NotBlank
     private String polaziste;
     /**
      * Mesto odredista putovanja
      */
     @Column(name = "odrediste", nullable = false)
+    @NotBlank
     private String odrediste;
     /**
      * Vreme polaska putovanja
@@ -53,6 +57,7 @@ public class Putovanje {
      * Osnovna cena putovanja
      */
     @Column(name = "osnovna_cena", nullable = false)
+    @Positive
     private double osnovnaCena;
     /**
      * Lista karata vezanih za ovo putovanje

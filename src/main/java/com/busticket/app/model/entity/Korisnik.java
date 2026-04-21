@@ -2,6 +2,8 @@ package com.busticket.app.model.entity;
 
 import com.busticket.app.model.entity.enums.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -31,32 +33,38 @@ public class Korisnik {
      * Ime korisnika
      */
     @Column(name = "ime", nullable = false)
+    @NotBlank
     private String ime;
     /**
      * Prezime korisnika
      */
     @Column(name = "prezime", nullable = false)
+    @NotBlank
     private String prezime;
     /**
      * Email adresa korisnika, mora biti jedinstvena
      */
     @Column(name = "email", nullable = false, unique = true)
+    @NotBlank
     private String email;
     /**
      * Korisnicko ime korisnika, mora biti jedinstveno
      */
     @Column(name = "username", nullable = false, unique = true)
+    @NotBlank
     private String username;
     /**
      * Lozinka korisnika
      */
     @Column(name = "password", nullable = false)
+    @NotBlank
     private String password;
     /**
      * Uloga korisnika, moze biti USER ili ADMIN
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
+    @NotNull
     private Role role;
     /**
      * Lista ocena koje je korisnik dao za putovanja
