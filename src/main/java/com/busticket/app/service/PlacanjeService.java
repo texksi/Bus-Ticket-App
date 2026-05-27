@@ -53,7 +53,7 @@ public class PlacanjeService {
         rezervacijaRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Rezervacija nije pronadjena")
         );
-        List<Placanje> placanja = placanjeRepository.findAllByRezervacijaId(id);
-        return placanja.stream().map(placanjeMapper::toResponse).toList();
+        List<Placanje> placanjaZaRezervaciju = placanjeRepository.findAllByRezervacijaId(id);
+        return placanjaZaRezervaciju.stream().map(placanjeMapper::toResponse).toList();
     }
 }
