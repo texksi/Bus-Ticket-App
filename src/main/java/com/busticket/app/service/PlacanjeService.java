@@ -50,7 +50,7 @@ public class PlacanjeService {
      *                                 custom exception sa porukom "Rezervacija nije pronadjena"
      */
     public List<PlacanjeResponseDTO> getPlacanjaForRezervacija(Long id) {
-        Rezervacija rezervacija = rezervacijaRepository.findById(id).orElseThrow(
+        rezervacijaRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Rezervacija nije pronadjena")
         );
         List<Placanje> placanja = placanjeRepository.findAllByRezervacijaId(id);
