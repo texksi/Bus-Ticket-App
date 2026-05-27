@@ -25,6 +25,7 @@ public class RezervacijaService {
     private final RezervacijaRepository rezervacijaRepository;
     private final RezervacijaMapper rezervacijaMapper;
     private final KorisnikRepository korisnikRepository;
+    private static final String REZERVACIJA_NOT_FOUND = "Rezervacija nije pronadjena";
 
     /**
      * Metoda koja pronalazi i vraca rezervaciju na osnovu prosledjenog ID parametra
@@ -37,7 +38,7 @@ public class RezervacijaService {
      */
     public RezervacijaResponseDTO getRezervacijaById(Long id){
         Rezervacija rezervacija = rezervacijaRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Rezervacija nije pronadjena"));
+                () -> new EntityNotFoundException(REZERVACIJA_NOT_FOUND));
         return rezervacijaMapper.toResponse(rezervacija);
     }
 
@@ -84,7 +85,7 @@ public class RezervacijaService {
      */
     public RezervacijaResponseDTO updateRezervacija(Long id, String status, String nacinPlacanja, double ukupanIznos){
         Rezervacija savedRezervacija = rezervacijaRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Rezervacija nije pronadjena"));
+                () -> new EntityNotFoundException(REZERVACIJA_NOT_FOUND));
         savedRezervacija.setStatus(status);
         savedRezervacija.setNacinPlacanja(nacinPlacanja);
         savedRezervacija.setUkupanIznos(ukupanIznos);
@@ -101,8 +102,8 @@ public class RezervacijaService {
      * sa porukom "Rezervacija nije pronadjena"
      */
     public void deleteRezervacija(Long id){
-        Rezervacija rezervacija = rezervacijaRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Rezervacija nije pronadjena")
+        rezervacijaRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(REZERVACIJA_NOT_FOUND)
         );
         rezervacijaRepository.deleteById(id);
     }
@@ -118,7 +119,7 @@ public class RezervacijaService {
      * ne postoji u sistemu sa porukom "Korisnik ne postoji"
      */
     public List<RezervacijaResponseDTO> getRezervacijeByKorisnik(Long korisnikId){
-        Korisnik korisnik = korisnikRepository.findById(korisnikId).orElseThrow(
+        korisnikRepository.findById(korisnikId).orElseThrow(
                 () -> new EntityNotFoundException("Korisnik ne postoji")
         );
         List<Rezervacija> rezervacije = rezervacijaRepository.findAllByKorisnikId(korisnikId);

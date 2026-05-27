@@ -21,7 +21,8 @@ public class KompanijaService {
 
     private final KompanijaRepository kompanijaRepository;
     private final KompanijaMapper kompanijaMapper;
-
+    private static final String KOMPANIJA_NOT_FOUND = "Kompanija nije pronadjena";
+    
     /**
      * Metoda koja pronalazi i vraca kompaniju na osnovu prosledjenog ID-a, prvo proverava da li kompanija postoji
      * u sistemu, u slucaju da ne postoji baca custom Exception
@@ -33,7 +34,7 @@ public class KompanijaService {
      */
     public KompanijaResponseDTO getKompanijaById(Long id) {
         Kompanija kompanija = kompanijaRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Kompanija nije pronadjena"));
+                () -> new EntityNotFoundException(KOMPANIJA_NOT_FOUND));
         return kompanijaMapper.toResponse(kompanija);
     }
 
@@ -74,7 +75,7 @@ public class KompanijaService {
      */
     public KompanijaResponseDTO updateKompanija(Long id, String naziv, String kontakt) {
         Kompanija savedKompanija = kompanijaRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Kompanija nije pronadjena")
+                () -> new EntityNotFoundException(KOMPANIJA_NOT_FOUND)
         );
         savedKompanija.setNaziv(naziv);
         savedKompanija.setKontakt(kontakt);
@@ -91,8 +92,8 @@ public class KompanijaService {
      *                                 sa porukom "Kompanija nije pronadjena"
      */
     public void deleteKompanija(Long id) {
-        Kompanija kompanija = kompanijaRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Kompanija nije pronadjena")
+        kompanijaRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(KOMPANIJA_NOT_FOUND)
         );
         kompanijaRepository.deleteById(id);
     }

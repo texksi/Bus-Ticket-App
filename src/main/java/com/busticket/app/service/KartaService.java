@@ -28,6 +28,7 @@ public class KartaService {
     private final KartaMapper kartaMapper;
     private final RezervacijaRepository rezervacijaRepository;
     private final PutovanjeRepository putovanjeRepository;
+    private static final String KARTA_NOT_FOUND = "Karta nije pronadjena";
 
     /**
      * Metoda koja pronalazi i vraca kartu na osnovu prosledjenog ID-a, prvo proverava da li ta karta uospte postoji
@@ -39,7 +40,7 @@ public class KartaService {
      *                                 sa porukom "Karta nije pronadjena"
      */
     public KartaResponseDTO getKartaById(Long id) {
-        Karta karta = kartaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Karta nije pronadjena"));
+        Karta karta = kartaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(KARTA_NOT_FOUND));
         return kartaMapper.toResponse(karta);
     }
 
@@ -92,7 +93,7 @@ public class KartaService {
      */
     public KartaResponseDTO updateKarta(Long id, String brojSedista, String tip) {
         Karta savedKarta = kartaRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Karta nije pronadjena"));
+                () -> new EntityNotFoundException(KARTA_NOT_FOUND));
         savedKarta.setBrojSedista(brojSedista);
         savedKarta.setTip(tip);
         Karta karta = kartaRepository.save(savedKarta);
@@ -108,8 +109,8 @@ public class KartaService {
      *                                 sa porukom "Karta nije pronadjena"
      */
     public void deleteKarta(Long id) {
-        Karta karta = kartaRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Karta nije pronadjena")
+        kartaRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(KARTA_NOT_FOUND)
         );
         kartaRepository.deleteById(id);
     }
@@ -125,7 +126,7 @@ public class KartaService {
      *                                 custom exception sa porukom "Putovanje nije pronadjeno"
      */
     public List<KartaResponseDTO> getAllKarteForPutovanje(Long id) {
-        Putovanje putovanje = putovanjeRepository.findById(id).orElseThrow(
+        putovanjeRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Putovanje nije pronadjeno")
         );
         List<Karta> karte = kartaRepository.findAllByPutovanjeId(id);
@@ -143,7 +144,7 @@ public class KartaService {
      *                                 custom exception sa porukom "Rezervacija nije pronadjena"
      */
     public List<KartaResponseDTO> getAllKarteForRezervacija(Long id) {
-        Rezervacija rezervacija = rezervacijaRepository.findById(id).orElseThrow(
+        rezervacijaRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Rezervacija nije pronadjena")
         );
         List<Karta> karte = kartaRepository.findAllByRezervacijaId(id);
