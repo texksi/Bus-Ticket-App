@@ -1,9 +1,9 @@
 package com.busticket.app.controller;
 
-import com.busticket.app.model.dto.RequestDTOs.KorisnikRequestDTO;
-import com.busticket.app.model.dto.ResponseDTOs.KorisnikResponseDTO;
-import com.busticket.app.model.dto.ResponseDTOs.OcenaResponseDTO;
-import com.busticket.app.model.dto.ResponseDTOs.RezervacijaResponseDTO;
+import com.busticket.app.model.dto.request.KorisnikRequestDTO;
+import com.busticket.app.model.dto.response.KorisnikResponseDTO;
+import com.busticket.app.model.dto.response.OcenaResponseDTO;
+import com.busticket.app.model.dto.response.RezervacijaResponseDTO;
 import com.busticket.app.service.KorisnikService;
 import com.busticket.app.service.OcenaService;
 import com.busticket.app.service.RezervacijaService;

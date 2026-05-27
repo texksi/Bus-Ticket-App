@@ -1,8 +1,8 @@
 package com.busticket.app.controller;
 
-import com.busticket.app.model.dto.RequestDTOs.RezervacijaRequestDTO;
-import com.busticket.app.model.dto.ResponseDTOs.KartaResponseDTO;
-import com.busticket.app.model.dto.ResponseDTOs.RezervacijaResponseDTO;
+import com.busticket.app.model.dto.request.RezervacijaRequestDTO;
+import com.busticket.app.model.dto.response.KartaResponseDTO;
+import com.busticket.app.model.dto.response.RezervacijaResponseDTO;
 import com.busticket.app.service.KartaService;
 import com.busticket.app.service.RezervacijaService;
 import lombok.RequiredArgsConstructor;

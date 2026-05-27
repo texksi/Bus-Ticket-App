@@ -1,10 +1,9 @@
 package com.busticket.app.service;
 
-import com.busticket.app.exceptions.EntityAlreadyExistsException;
 import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.RezervacijaMapper;
-import com.busticket.app.model.dto.RequestDTOs.RezervacijaRequestDTO;
-import com.busticket.app.model.dto.ResponseDTOs.RezervacijaResponseDTO;
+import com.busticket.app.model.dto.request.RezervacijaRequestDTO;
+import com.busticket.app.model.dto.response.RezervacijaResponseDTO;
 import com.busticket.app.model.entity.Korisnik;
 import com.busticket.app.model.entity.Rezervacija;
 import com.busticket.app.repository.KorisnikRepository;

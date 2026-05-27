@@ -1,8 +1,8 @@
 package com.busticket.app.controller;
 
-import com.busticket.app.model.dto.RequestDTOs.PutovanjeRequestDTO;
-import com.busticket.app.model.dto.ResponseDTOs.OcenaResponseDTO;
-import com.busticket.app.model.dto.ResponseDTOs.PutovanjeResponseDTO;
+import com.busticket.app.model.dto.request.PutovanjeRequestDTO;
+import com.busticket.app.model.dto.response.OcenaResponseDTO;
+import com.busticket.app.model.dto.response.PutovanjeResponseDTO;
 import com.busticket.app.service.OcenaService;
 import com.busticket.app.service.PutovanjeService;
 import lombok.RequiredArgsConstructor;

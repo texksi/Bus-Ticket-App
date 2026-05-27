@@ -1,7 +1,7 @@
 package com.busticket.app.mapper;
 
-import com.busticket.app.model.dto.RequestDTOs.KartaRequestDTO;
-import com.busticket.app.model.dto.ResponseDTOs.KartaResponseDTO;
+import com.busticket.app.model.dto.request.KartaRequestDTO;
+import com.busticket.app.model.dto.response.KartaResponseDTO;
 import com.busticket.app.model.entity.Karta;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

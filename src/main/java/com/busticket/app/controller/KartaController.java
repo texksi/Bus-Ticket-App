@@ -1,7 +1,7 @@
 package com.busticket.app.controller;
 
-import com.busticket.app.model.dto.RequestDTOs.KartaRequestDTO;
-import com.busticket.app.model.dto.ResponseDTOs.KartaResponseDTO;
+import com.busticket.app.model.dto.request.KartaRequestDTO;
+import com.busticket.app.model.dto.response.KartaResponseDTO;
 import com.busticket.app.service.KartaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
