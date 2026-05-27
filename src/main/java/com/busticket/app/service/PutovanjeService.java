@@ -2,8 +2,8 @@ package com.busticket.app.service;
 
 import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.PutovanjeMapper;
-import com.busticket.app.model.dto.RequestDTOs.PutovanjeRequestDTO;
-import com.busticket.app.model.dto.ResponseDTOs.PutovanjeResponseDTO;
+import com.busticket.app.model.dto.request.PutovanjeRequestDTO;
+import com.busticket.app.model.dto.response.PutovanjeResponseDTO;
 import com.busticket.app.model.entity.Kompanija;
 import com.busticket.app.model.entity.Putovanje;
 import com.busticket.app.model.entity.Vozilo;
@@ -29,6 +29,7 @@ public class PutovanjeService {
     private final PutovanjeMapper putovanjeMapper;
     private final VoziloRepository voziloRepository;
     private final KompanijaRepository kompanijaRepository;
+    private static final String PUTOVANJE_NOT_FOUND = "Putovanje nije pronadjeno";
 
     /**
      * Metoda koja pronalazi i vraca putovanje na osnovu prosledjenog ID-a, prvo proverava da li to putovanje postoji
@@ -41,7 +42,7 @@ public class PutovanjeService {
      */
     public PutovanjeResponseDTO getPutovanjeById(Long id) {
         Putovanje putovanje = putovanjeRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Putovanje nije pronadjeno"));
+                () -> new EntityNotFoundException(PUTOVANJE_NOT_FOUND));
         return putovanjeMapper.toResponse(putovanje);
     }
 
@@ -97,7 +98,7 @@ public class PutovanjeService {
      */
     public PutovanjeResponseDTO updatePutovanje(Long id, String polaziste, String odrediste, LocalDateTime vremePolaska, LocalDateTime vremeDolaska, double osnovnaCena) {
         Putovanje savedPutovanje = putovanjeRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Putovanje nije pronadjeno")
+                () -> new EntityNotFoundException(PUTOVANJE_NOT_FOUND)
         );
         savedPutovanje.setPolaziste(polaziste);
         savedPutovanje.setOdrediste(odrediste);
@@ -117,8 +118,8 @@ public class PutovanjeService {
      *                                 sa porukom "Putovanje nije pronadjeno"
      */
     public void deletePutovanje(Long id) {
-        Putovanje putovanje = putovanjeRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Putovanje nije pronadjeno")
+        putovanjeRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(PUTOVANJE_NOT_FOUND)
         );
         putovanjeRepository.deleteById(id);
     }
@@ -134,7 +135,7 @@ public class PutovanjeService {
      *                                 "Kompanija nije pronadjena"
      */
     public List<PutovanjeResponseDTO> getPutovanjaByKompanija(Long kompanijaId) {
-        Kompanija kompanija = kompanijaRepository.findById(kompanijaId).orElseThrow(
+        kompanijaRepository.findById(kompanijaId).orElseThrow(
                 () -> new EntityNotFoundException("Kompanija nije pronadjena")
         );
         List<Putovanje> putovanja = putovanjeRepository.findAllByKompanijaId(kompanijaId);

@@ -68,7 +68,7 @@ public class PutovanjeRepositoryTests {
 
     @Test
     public void getAllPutovanjaTest(){
-        Putovanje saved = putovanjeRepository.save(builderPutovanje());
+        putovanjeRepository.save(builderPutovanje());
         List<Putovanje> all = putovanjeRepository.findAll();
         Assertions.assertThat(all).hasSize(1);
     }

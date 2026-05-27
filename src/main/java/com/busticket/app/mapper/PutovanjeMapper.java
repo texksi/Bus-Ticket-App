@@ -1,7 +1,7 @@
 package com.busticket.app.mapper;
 
-import com.busticket.app.model.dto.RequestDTOs.PutovanjeRequestDTO;
-import com.busticket.app.model.dto.ResponseDTOs.PutovanjeResponseDTO;
+import com.busticket.app.model.dto.request.PutovanjeRequestDTO;
+import com.busticket.app.model.dto.response.PutovanjeResponseDTO;
 import com.busticket.app.model.entity.Putovanje;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

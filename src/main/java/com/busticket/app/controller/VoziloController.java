@@ -1,7 +1,7 @@
 package com.busticket.app.controller;
 
-import com.busticket.app.model.dto.RequestDTOs.VoziloRequestDTO;
-import com.busticket.app.model.dto.ResponseDTOs.VoziloResponseDTO;
+import com.busticket.app.model.dto.request.VoziloRequestDTO;
+import com.busticket.app.model.dto.response.VoziloResponseDTO;
 import com.busticket.app.service.VoziloService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

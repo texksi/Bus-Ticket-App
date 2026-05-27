@@ -39,7 +39,7 @@ public class KompanijaRepositoryTests {
 
     @Test
     public void getAllKompanijeTest(){
-        Kompanija saved = kompanijaRepository.save(builderKompanija());
+        kompanijaRepository.save(builderKompanija());
         List<Kompanija> all = kompanijaRepository.findAll();
         Assertions.assertThat(all).hasSize(1);
     }

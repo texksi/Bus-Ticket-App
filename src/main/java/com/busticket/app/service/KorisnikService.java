@@ -3,8 +3,8 @@ package com.busticket.app.service;
 import com.busticket.app.exceptions.EntityAlreadyExistsException;
 import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.KorisnikMapper;
-import com.busticket.app.model.dto.RequestDTOs.KorisnikRequestDTO;
-import com.busticket.app.model.dto.ResponseDTOs.KorisnikResponseDTO;
+import com.busticket.app.model.dto.request.KorisnikRequestDTO;
+import com.busticket.app.model.dto.response.KorisnikResponseDTO;
 import com.busticket.app.model.entity.Korisnik;
 import com.busticket.app.repository.KorisnikRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +23,7 @@ public class KorisnikService {
 
     private final KorisnikRepository korisnikRepository;
     private final KorisnikMapper korisnikMapper;
+    private static final String KORISNIK_NOT_FOUND = "Korisnik ne postoji";
 
     /**
      * Metoda koja pronalazi i vraca korisnika na osnovu prosledjenog ID parametra
@@ -35,7 +36,7 @@ public class KorisnikService {
      */
     public KorisnikResponseDTO getKorisnikById(Long id) {
         Korisnik korisnik = korisnikRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Korisnik ne postoji"));
+                () -> new EntityNotFoundException(KORISNIK_NOT_FOUND));
         return korisnikMapper.toResponse(korisnik);
     }
 
@@ -50,7 +51,7 @@ public class KorisnikService {
      */
     public KorisnikResponseDTO getKorisnikByUsername(String username) {
         Korisnik korisnik = korisnikRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Korisnik ne postoji"));
+                () -> new EntityNotFoundException(KORISNIK_NOT_FOUND));
         return korisnikMapper.toResponse(korisnik);
     }
 
@@ -102,7 +103,7 @@ public class KorisnikService {
      */
     public KorisnikResponseDTO updateKorisnik(Long id, String username, String email, String ime, String prezime) {
         Korisnik savedKorisnik = korisnikRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Korisnik ne postoji"));
+                .orElseThrow(() -> new EntityNotFoundException(KORISNIK_NOT_FOUND));
         if (!savedKorisnik.getUsername().equals(username) && korisnikRepository.existsByUsername(username)) {
             throw new EntityAlreadyExistsException("Korisnik sa tim username-om već postoji");
         }
@@ -126,8 +127,8 @@ public class KorisnikService {
      *sa porukom "Korisnik ne postoji"
      */
     public void deleteKorisnik(Long id) {
-        Korisnik korisnik = korisnikRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Korisnik ne postoji")
+        korisnikRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(KORISNIK_NOT_FOUND)
         );
         korisnikRepository.deleteById(id);
     }

@@ -2,7 +2,7 @@ package com.busticket.app.service;
 
 import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.PlacanjeMapper;
-import com.busticket.app.model.dto.ResponseDTOs.PlacanjeResponseDTO;
+import com.busticket.app.model.dto.response.PlacanjeResponseDTO;
 import com.busticket.app.model.entity.Placanje;
 import com.busticket.app.repository.PlacanjeRepository;
 import com.busticket.app.repository.RezervacijaRepository;

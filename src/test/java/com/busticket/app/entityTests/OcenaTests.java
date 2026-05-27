@@ -42,7 +42,7 @@ public class OcenaTests {
                 .putovanje(putovanje)
                 .build();
         assertThat(ocena.getKomentar()).isEqualTo("Odlicno");
-        assertThat(ocena.getOcena()).isEqualTo(5);
+        assertThat(ocena.getOcenaVrednost()).isEqualTo(5);
         assertThat(ocena.getKorisnik()).isEqualTo(korisnik);
         assertThat(ocena.getPutovanje()).isEqualTo(putovanje);
     }

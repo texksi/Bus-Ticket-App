@@ -1,6 +1,6 @@
 package com.busticket.app.controller;
 
-import com.busticket.app.model.dto.ResponseDTOs.PlacanjeResponseDTO;
+import com.busticket.app.model.dto.response.PlacanjeResponseDTO;
 import com.busticket.app.service.StripeService;
 import com.stripe.exception.StripeException;
 import lombok.RequiredArgsConstructor;

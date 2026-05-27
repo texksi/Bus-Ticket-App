@@ -1,4 +1,4 @@
-package com.busticket.app.model.dto.ResponseDTOs;
+package com.busticket.app.model.dto.response;
 
 import com.busticket.app.model.entity.enums.Role;
 import lombok.*;

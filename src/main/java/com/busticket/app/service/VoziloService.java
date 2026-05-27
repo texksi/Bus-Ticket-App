@@ -3,8 +3,8 @@ package com.busticket.app.service;
 import com.busticket.app.exceptions.EntityAlreadyExistsException;
 import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.VoziloMapper;
-import com.busticket.app.model.dto.RequestDTOs.VoziloRequestDTO;
-import com.busticket.app.model.dto.ResponseDTOs.VoziloResponseDTO;
+import com.busticket.app.model.dto.request.VoziloRequestDTO;
+import com.busticket.app.model.dto.response.VoziloResponseDTO;
 import com.busticket.app.model.entity.Kompanija;
 import com.busticket.app.model.entity.Vozilo;
 import com.busticket.app.repository.KompanijaRepository;
@@ -25,6 +25,7 @@ public class VoziloService {
     private final VoziloRepository voziloRepository;
     private final VoziloMapper voziloMapper;
     private final KompanijaRepository kompanijaRepository;
+    private static final String VOZILO_NOT_FOUND = "Vozilo nije pronadjeno";
 
     /**
      * Metoda koja pronalazi i vraca vozilo na osnovu prosledjenog ID-a, prvo proverava da li to vozilo postoji
@@ -37,7 +38,7 @@ public class VoziloService {
      */
     public VoziloResponseDTO getVoziloById(Long id) {
         Vozilo vozilo = voziloRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Vozilo nije pronadjeno"));
+                () -> new EntityNotFoundException(VOZILO_NOT_FOUND));
         return voziloMapper.toResponse(vozilo);
     }
 
@@ -52,7 +53,7 @@ public class VoziloService {
      *                                 "Kompanija nije pronadjena"
      */
     public List<VoziloResponseDTO> getAllVozilaForKompanija(Long kompanijaId) {
-        Kompanija kompanija = kompanijaRepository.findById(kompanijaId).orElseThrow(
+        kompanijaRepository.findById(kompanijaId).orElseThrow(
                 () -> new EntityNotFoundException("Kompanija nije pronadjena")
         );
         List<Vozilo> vozila = voziloRepository.findAllByKompanijaId(kompanijaId);
@@ -105,7 +106,7 @@ public class VoziloService {
      */
     public VoziloResponseDTO updateVozilo(Long id, int kapacitet, String registracija, int brojRedova, int brojKolona) {
         Vozilo savedVozilo = voziloRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Vozilo nije pronadjeno")
+                () -> new EntityNotFoundException(VOZILO_NOT_FOUND)
         );
         if (!savedVozilo.getRegistracija().equals(registracija) && voziloRepository.existsByRegistracija(registracija)) {
             throw new EntityAlreadyExistsException("Vozilo sa ovom registracijom vec postoji");
@@ -127,8 +128,8 @@ public class VoziloService {
      *                                 sa porukom "Vozilo nije pronadjeno"
      */
     public void deleteVozilo(Long id) {
-        Vozilo vozilo = voziloRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Vozilo nije pronadjeno")
+        voziloRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(VOZILO_NOT_FOUND)
         );
         voziloRepository.deleteById(id);
     }

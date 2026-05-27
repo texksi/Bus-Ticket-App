@@ -38,7 +38,7 @@ public class Ocena {
      */
     @Column(name = "ocena", nullable = false)
     @Positive
-    private int ocena;
+    private int ocenaVrednost;
     /**
      * Korisnik koji je dao ocenu
      */

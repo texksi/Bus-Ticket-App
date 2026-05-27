@@ -61,7 +61,7 @@ public class KorisnikRepositoryTests {
 
     @Test
     public void getAllKorisniciTest(){
-        Korisnik saved = korisnikRepository.save(builderKorisnik());
+        korisnikRepository.save(builderKorisnik());
         List<Korisnik> all = korisnikRepository.findAll();
         Assertions.assertThat(all).hasSize(1);
     }

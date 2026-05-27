@@ -2,8 +2,8 @@ package com.busticket.app.serviceTests;
 
 import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.KompanijaMapper;
-import com.busticket.app.model.dto.RequestDTOs.KompanijaRequestDTO;
-import com.busticket.app.model.dto.ResponseDTOs.KompanijaResponseDTO;
+import com.busticket.app.model.dto.request.KompanijaRequestDTO;
+import com.busticket.app.model.dto.response.KompanijaResponseDTO;
 import com.busticket.app.model.entity.Kompanija;
 import com.busticket.app.repository.KompanijaRepository;
 import com.busticket.app.service.KompanijaService;

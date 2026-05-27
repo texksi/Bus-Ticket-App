@@ -64,7 +64,7 @@ public class RezervacijaRepositoryTests {
 
     @Test
     public void getAllRezervacijeTest(){
-        Rezervacija saved = rezervacijaRepository.save(builderRezervacija());
+        rezervacijaRepository.save(builderRezervacija());
         List<Rezervacija> all = rezervacijaRepository.findAll();
         Assertions.assertThat(all).hasSize(1);
     }

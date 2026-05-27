@@ -1,4 +1,4 @@
-package com.busticket.app.model.dto.RequestDTOs;
+package com.busticket.app.model.dto.response;
 
 import lombok.*;
 
@@ -9,8 +9,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PutovanjeRequestDTO {
+public class PutovanjeResponseDTO {
 
+    private Long id;
     private String polaziste;
     private String odrediste;
     private LocalDateTime vremePolaska;

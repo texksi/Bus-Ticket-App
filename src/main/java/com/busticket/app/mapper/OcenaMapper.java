@@ -1,7 +1,7 @@
 package com.busticket.app.mapper;
 
-import com.busticket.app.model.dto.RequestDTOs.OcenaRequestDTO;
-import com.busticket.app.model.dto.ResponseDTOs.OcenaResponseDTO;
+import com.busticket.app.model.dto.request.OcenaRequestDTO;
+import com.busticket.app.model.dto.response.OcenaResponseDTO;
 import com.busticket.app.model.entity.Ocena;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

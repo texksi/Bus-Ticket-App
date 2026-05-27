@@ -1,4 +1,4 @@
-package com.busticket.app.model.dto.RequestDTOs;
+package com.busticket.app.model.dto.request;
 
 import lombok.*;
 

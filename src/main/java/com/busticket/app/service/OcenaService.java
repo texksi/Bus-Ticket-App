@@ -3,8 +3,8 @@ package com.busticket.app.service;
 import com.busticket.app.exceptions.EntityAlreadyExistsException;
 import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.OcenaMapper;
-import com.busticket.app.model.dto.RequestDTOs.OcenaRequestDTO;
-import com.busticket.app.model.dto.ResponseDTOs.OcenaResponseDTO;
+import com.busticket.app.model.dto.request.OcenaRequestDTO;
+import com.busticket.app.model.dto.response.OcenaResponseDTO;
 import com.busticket.app.model.entity.Korisnik;
 import com.busticket.app.model.entity.Ocena;
 import com.busticket.app.model.entity.Putovanje;
@@ -41,7 +41,7 @@ public class OcenaService {
      *                                 Exception sa porukom "Korisnik ne postoji"
      */
     public List<OcenaResponseDTO> getOceneByKorisnik(Long id) {
-        Korisnik korisnik = korisnikRepository.findById(id).orElseThrow(
+        korisnikRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Korisnik ne postoji")
         );
         List<Ocena> ocene = ocenaRepository.findAllByKorisnikId(id);
@@ -59,7 +59,7 @@ public class OcenaService {
      *                                 Exception sa porukom "Putovanje nije pronadjeno"
      */
     public List<OcenaResponseDTO> getOceneForPutovanje(Long id) {
-        Putovanje putovanje = putovanjeRepository.findById(id).orElseThrow(
+        putovanjeRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Putovanje nije pronadjeno")
         );
         List<Ocena> ocene = ocenaRepository.findAllByPutovanjeId(id);
@@ -105,7 +105,7 @@ public class OcenaService {
      *                                 sa porukom "Ocena nije pronadjena"
      */
     public void deleteOcena(Long id) {
-        Ocena ocena = ocenaRepository.findById(id).orElseThrow(
+        ocenaRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Ocena nije pronadjena")
         );
         ocenaRepository.deleteById(id);

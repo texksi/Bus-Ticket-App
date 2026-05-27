@@ -1,4 +1,4 @@
-package com.busticket.app.model.dto.RequestDTOs;
+package com.busticket.app.model.dto.response;
 
 import lombok.*;
 
@@ -7,8 +7,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class VoziloRequestDTO {
+public class VoziloResponseDTO {
 
+    private Long id;
     private String registracija;
     private int kapacitet;
     private int brojRedova;

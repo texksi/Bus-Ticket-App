@@ -1,7 +1,7 @@
 package com.busticket.app.mapper;
 
-import com.busticket.app.model.dto.RequestDTOs.KorisnikRequestDTO;
-import com.busticket.app.model.dto.ResponseDTOs.KorisnikResponseDTO;
+import com.busticket.app.model.dto.request.KorisnikRequestDTO;
+import com.busticket.app.model.dto.response.KorisnikResponseDTO;
 import com.busticket.app.model.entity.Korisnik;
 import org.mapstruct.Mapper;
 

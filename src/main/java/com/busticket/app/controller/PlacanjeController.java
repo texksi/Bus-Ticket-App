@@ -1,6 +1,6 @@
 package com.busticket.app.controller;
 
-import com.busticket.app.model.dto.ResponseDTOs.PlacanjeResponseDTO;
+import com.busticket.app.model.dto.response.PlacanjeResponseDTO;
 import com.busticket.app.service.PlacanjeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
