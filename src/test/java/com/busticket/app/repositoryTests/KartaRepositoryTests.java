@@ -86,7 +86,7 @@ public class KartaRepositoryTests {
 
     @Test
     public void getAllKarte(){
-        Karta saved = kartaRepository.save(builderKarta());
+        kartaRepository.save(builderKarta());
         List<Karta> all = kartaRepository.findAll();
         Assertions.assertThat(all).hasSize(1);
     }

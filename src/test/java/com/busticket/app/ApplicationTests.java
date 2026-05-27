@@ -10,6 +10,7 @@ class ApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// Test prolazi ukoliko se aplikacija uspesno pokrene bez gresaka
 	}
 
 }
