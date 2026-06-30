@@ -49,7 +49,7 @@ public class OcenaServiceTest {
     private Ocena builderOcena(){
         return Ocena.builder()
                 .komentar("komentar")
-                .ocena(4)
+                .ocenaVrednost(4)
                 .korisnik(savedKorisnik)
                 .putovanje(savedPutovanje)
                 .build();
