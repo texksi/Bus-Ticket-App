@@ -37,7 +37,7 @@ public class OcenaTests {
                 .osnovnaCena(700.0).build();
         Ocena ocena = Ocena.builder()
                 .komentar("Odlicno")
-                .ocena(5)
+                .ocenaVrednost(5)
                 .korisnik(korisnik)
                 .putovanje(putovanje)
                 .build();
@@ -64,7 +64,7 @@ public class OcenaTests {
     public void validation_ThrowsWhenKomentarIsBlank() {
         Ocena ocena = Ocena.builder()
                 .komentar("")
-                .ocena(4)
+                .ocenaVrednost(4)
                 .build();
         Set<ConstraintViolation<Ocena>> violations = validator.validate(ocena);
         assertThat(violations).isNotEmpty();
@@ -74,7 +74,7 @@ public class OcenaTests {
     public void validation_ThrowsWhenOcenaIsNegative() {
         Ocena ocena = Ocena.builder()
                 .komentar("Odlicno")
-                .ocena(-1)
+                .ocenaVrednost(-1)
                 .build();
         Set<ConstraintViolation<Ocena>> violations = validator.validate(ocena);
         assertThat(violations).isNotEmpty();
