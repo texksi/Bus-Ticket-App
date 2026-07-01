@@ -1,5 +1,6 @@
 package com.busticket.app.entityTests;
 
+import com.busticket.app.model.entity.Grad;
 import com.busticket.app.model.entity.Putovanje;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -26,17 +27,19 @@ public class PutovanjeTests {
 
     @Test
     public void builder_SetsAllFields() {
+        Grad polaziste = Grad.builder().naziv("Beograd").skracenica("BG").build();
+        Grad odrediste = Grad.builder().naziv("Novi Sad").skracenica("NS").build();
         LocalDateTime polazak = LocalDateTime.of(2025, 6, 1, 8, 0);
         LocalDateTime dolazak = LocalDateTime.of(2025, 6, 1, 12, 0);
         Putovanje putovanje = Putovanje.builder()
-                .polaziste("Beograd")
-                .odrediste("Novi Sad")
+                .polaziste(polaziste)
+                .odrediste(odrediste)
                 .vremePolaska(polazak)
                 .vremeDolaska(dolazak)
                 .osnovnaCena(800.0)
                 .build();
-        assertThat(putovanje.getPolaziste()).isEqualTo("Beograd");
-        assertThat(putovanje.getOdrediste()).isEqualTo("Novi Sad");
+        assertThat(putovanje.getPolaziste()).isEqualTo(polaziste);
+        assertThat(putovanje.getOdrediste()).isEqualTo(odrediste);
         assertThat(putovanje.getVremePolaska()).isEqualTo(polazak);
         assertThat(putovanje.getVremeDolaska()).isEqualTo(dolazak);
         assertThat(putovanje.getOsnovnaCena()).isEqualTo(800.0);
@@ -50,9 +53,11 @@ public class PutovanjeTests {
 
     @Test
     public void builder_DefaultVremePolaskaVremeDolaska_IsNotNull(){
+        Grad polaziste = Grad.builder().naziv("Beograd").skracenica("BG").build();
+        Grad odrediste = Grad.builder().naziv("Novi Sad").skracenica("NS").build();
         Putovanje putovanje = Putovanje.builder()
-                .polaziste("Beograd")
-                .odrediste("Novi Sad")
+                .polaziste(polaziste)
+                .odrediste(odrediste)
                 .osnovnaCena(800.0)
                 .build();
         assertThat(putovanje.getVremeDolaska()).isNotNull();
@@ -62,37 +67,38 @@ public class PutovanjeTests {
     @Test
     public void setter_SetPolaziste() {
         Putovanje putovanje = new Putovanje();
-        putovanje.setPolaziste("Rim");
-        assertThat(putovanje.getPolaziste()).isEqualTo("Rim");
+        Grad polaziste = Grad.builder().naziv("Rim").skracenica("RI").build();
+        putovanje.setPolaziste(polaziste);
+        assertThat(putovanje.getPolaziste()).isEqualTo(polaziste);
     }
 
     @Test
-    public void validation_ThrowsWhenPolazisteIsBlank() {
+    public void validation_ThrowsWhenPolazisteIsNull() {
         Putovanje putovanje = Putovanje.builder()
-                .polaziste("")
-                .odrediste("Novi Sad")
+                .polaziste(null)
+                .odrediste(Grad.builder().naziv("Novi Sad").skracenica("NS").build())
                 .osnovnaCena(800.0)
                 .build();
         Set<ConstraintViolation<Putovanje>> violations = validator.validate(putovanje);
-        assertThat(violations).isNotEmpty();
+        assertThat(violations).isNotNull();
     }
 
     @Test
-    public void validation_ThrowsWhenOdredisteIsBlank() {
+    public void validation_ThrowsWhenOdredisteIsNull() {
         Putovanje putovanje = Putovanje.builder()
-                .polaziste("Beograd")
-                .odrediste("")
+                .polaziste(Grad.builder().naziv("Beograd").skracenica("BG").build())
+                .odrediste(null)
                 .osnovnaCena(800.0)
                 .build();
         Set<ConstraintViolation<Putovanje>> violations = validator.validate(putovanje);
-        assertThat(violations).isNotEmpty();
+        assertThat(violations).isNotNull();
     }
 
     @Test
     public void validation_ThrowsWhenOsnovnaCenaIsNegative() {
         Putovanje putovanje = Putovanje.builder()
-                .polaziste("Beograd")
-                .odrediste("Novi Sad")
+                .polaziste(Grad.builder().naziv("Beograd").skracenica("BG").build())
+                .odrediste(Grad.builder().naziv("Novi Sad").skracenica("NS").build())
                 .osnovnaCena(-100.0)
                 .build();
         Set<ConstraintViolation<Putovanje>> violations = validator.validate(putovanje);

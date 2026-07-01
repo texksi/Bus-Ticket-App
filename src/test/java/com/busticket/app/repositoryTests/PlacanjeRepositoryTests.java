@@ -3,7 +3,9 @@ package com.busticket.app.repositoryTests;
 import com.busticket.app.model.entity.Korisnik;
 import com.busticket.app.model.entity.Placanje;
 import com.busticket.app.model.entity.Rezervacija;
+import com.busticket.app.model.entity.enums.NacinPlacanja;
 import com.busticket.app.model.entity.enums.Role;
+import com.busticket.app.model.entity.enums.StatusRezervacije;
 import com.busticket.app.repository.KorisnikRepository;
 import com.busticket.app.repository.PlacanjeRepository;
 import com.busticket.app.repository.RezervacijaRepository;
@@ -55,8 +57,8 @@ public class PlacanjeRepositoryTests {
         savedRezervacija = Rezervacija.builder()
                 .datumKreiranja(LocalDateTime.now())
                 .ukupanIznos(100)
-                .nacinPlacanja("Kartica")
-                .status("pending")
+                .nacinPlacanja(NacinPlacanja.KARTICA)
+                .status(StatusRezervacije.AKTIVNA)
                 .korisnik(savedKorisnik).build();
         rezervacijaRepository.save(savedRezervacija);
     }
