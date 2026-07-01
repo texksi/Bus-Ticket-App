@@ -1,5 +1,6 @@
 package com.busticket.app.entityTests;
 
+import com.busticket.app.model.entity.Grad;
 import com.busticket.app.model.entity.Korisnik;
 import com.busticket.app.model.entity.Ocena;
 import com.busticket.app.model.entity.Putovanje;
@@ -32,8 +33,10 @@ public class OcenaTests {
                 .ime("Ana").prezime("Anic")
                 .email("ana@email.com").username("ana123")
                 .password("pass").role(Role.USER).build();
+        Grad polaziste = Grad.builder().naziv("Beograd").skracenica("BG").build();
+        Grad odrediste = Grad.builder().naziv("Nis").skracenica("NI").build();
         Putovanje putovanje = Putovanje.builder()
-                .polaziste("Beograd").odrediste("Nis")
+                .polaziste(polaziste).odrediste(odrediste)
                 .osnovnaCena(700.0).build();
         Ocena ocena = Ocena.builder()
                 .komentar("Odlicno")

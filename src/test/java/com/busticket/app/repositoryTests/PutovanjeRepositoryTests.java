@@ -1,8 +1,10 @@
 package com.busticket.app.repositoryTests;
 
+import com.busticket.app.model.entity.Grad;
 import com.busticket.app.model.entity.Kompanija;
 import com.busticket.app.model.entity.Putovanje;
 import com.busticket.app.model.entity.Vozilo;
+import com.busticket.app.repository.GradRepository;
 import com.busticket.app.repository.KompanijaRepository;
 import com.busticket.app.repository.PutovanjeRepository;
 import com.busticket.app.repository.VoziloRepository;
@@ -26,13 +28,17 @@ public class PutovanjeRepositoryTests {
     private KompanijaRepository kompanijaRepository;
     @Autowired
     private VoziloRepository voziloRepository;
+    @Autowired
+    private GradRepository gradRepository;
     private Vozilo savedVozilo;
     private Kompanija savedKompanija;
 
     private Putovanje builderPutovanje(){
+        Grad polaziste = gradRepository.save(Grad.builder().naziv("Beograd").skracenica("BG").build());
+        Grad odrediste = gradRepository.save(Grad.builder().naziv("Novi Sad").skracenica("NS").build());
         return Putovanje.builder()
-                .polaziste("polaziste")
-                .odrediste("odrediste")
+                .polaziste(polaziste)
+                .odrediste(odrediste)
                 .vremePolaska(LocalDateTime.now())
                 .vremeDolaska(LocalDateTime.now().plusDays(4))
                 .osnovnaCena(100)
@@ -80,11 +86,12 @@ public class PutovanjeRepositoryTests {
     }
 
     @Test
-    public void updatePutovanjeTest(){
+    public void updatePutovanjeTest() {
+        Grad odrediste = gradRepository.save(Grad.builder().naziv("Novi Sad2").skracenica("NS2").build());
         Putovanje saved = putovanjeRepository.save(builderPutovanje());
-        saved.setOdrediste("novo odrediste");
+        saved.setOdrediste(odrediste);
         Putovanje updated = putovanjeRepository.save(saved);
-        Assertions.assertThat(updated.getOdrediste()).isEqualTo("novo odrediste");
+        Assertions.assertThat(updated.getOdrediste()).isEqualTo(odrediste);
     }
 
     @Test

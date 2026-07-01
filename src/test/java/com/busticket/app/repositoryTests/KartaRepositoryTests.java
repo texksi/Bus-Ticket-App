@@ -1,14 +1,11 @@
 package com.busticket.app.repositoryTests;
 
-import com.busticket.app.model.entity.Karta;
-import com.busticket.app.model.entity.Korisnik;
-import com.busticket.app.model.entity.Putovanje;
-import com.busticket.app.model.entity.Rezervacija;
+import com.busticket.app.model.entity.*;
+import com.busticket.app.model.entity.enums.NacinPlacanja;
 import com.busticket.app.model.entity.enums.Role;
-import com.busticket.app.repository.KartaRepository;
-import com.busticket.app.repository.KorisnikRepository;
-import com.busticket.app.repository.PutovanjeRepository;
-import com.busticket.app.repository.RezervacijaRepository;
+import com.busticket.app.model.entity.enums.StatusRezervacije;
+import com.busticket.app.model.entity.enums.TipKarte;
+import com.busticket.app.repository.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,16 +28,18 @@ public class KartaRepositoryTests {
     private RezervacijaRepository rezervacijaRepository;
     @Autowired
     private PutovanjeRepository putovanjeRepository;
+    @Autowired
+    private GradRepository gradRepository;
     private Rezervacija savedRezervacija;
     private Korisnik savedKorisnik;
     private Putovanje savedPutovanje;
 
-    private Karta builderKarta(){
+    private Karta builderKarta() {
         return Karta.builder()
                 .brojSedista("W1")
-                .osnovnaCena(100)
+                .finalnaCena(100.0)
                 .datumIzdavanja(LocalDateTime.now())
-                .tip("regular")
+                .tip(TipKarte.STANDARD)
                 .rezervacija(savedRezervacija)
                 .putovanje(savedPutovanje)
                 .build();
@@ -48,6 +47,10 @@ public class KartaRepositoryTests {
 
     @BeforeEach
     public void setup(){
+        Grad savedPolaziste = Grad.builder().naziv("Beograd").skracenica("BG").build();
+        gradRepository.save(savedPolaziste);
+        Grad savedOdrediste = Grad.builder().naziv("Nis").skracenica("NI").build();
+        gradRepository.save(savedOdrediste);
         kartaRepository.deleteAll();
         savedKorisnik = Korisnik.builder()
                 .ime("KorisnikIme")
@@ -61,13 +64,13 @@ public class KartaRepositoryTests {
         savedRezervacija = Rezervacija.builder()
                 .datumKreiranja(LocalDateTime.now())
                 .ukupanIznos(100)
-                .nacinPlacanja("Kartica")
-                .status("pending")
+                .nacinPlacanja(NacinPlacanja.KARTICA)
+                .status(StatusRezervacije.AKTIVNA)
                 .korisnik(savedKorisnik).build();
         rezervacijaRepository.save(savedRezervacija);
         savedPutovanje = Putovanje.builder()
-                .polaziste("polaziste")
-                .odrediste("odrediste")
+                .polaziste(savedPolaziste)
+                .odrediste(savedOdrediste)
                 .vremePolaska(LocalDateTime.now())
                 .vremeDolaska(LocalDateTime.now().plusDays(4))
                 .osnovnaCena(100)

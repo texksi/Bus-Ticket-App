@@ -5,6 +5,8 @@ import com.busticket.app.mapper.PlacanjeMapper;
 import com.busticket.app.model.dto.response.PlacanjeResponseDTO;
 import com.busticket.app.model.entity.Placanje;
 import com.busticket.app.model.entity.Rezervacija;
+import com.busticket.app.model.entity.enums.NacinPlacanja;
+import com.busticket.app.model.entity.enums.StatusRezervacije;
 import com.busticket.app.repository.PlacanjeRepository;
 import com.busticket.app.repository.RezervacijaRepository;
 import com.busticket.app.service.PlacanjeService;
@@ -50,8 +52,8 @@ public class PlacanjeServiceTest {
         savedRezervacija = Rezervacija.builder()
                 .datumKreiranja(LocalDateTime.now())
                 .ukupanIznos(100)
-                .nacinPlacanja("Kartica")
-                .status("pending")
+                .nacinPlacanja(NacinPlacanja.KARTICA)
+                .status(StatusRezervacije.AKTIVNA)
                 .korisnik(null).build();
     }
 

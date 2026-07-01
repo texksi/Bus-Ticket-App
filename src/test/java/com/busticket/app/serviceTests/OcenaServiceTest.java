@@ -5,10 +5,12 @@ import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.OcenaMapper;
 import com.busticket.app.model.dto.request.OcenaRequestDTO;
 import com.busticket.app.model.dto.response.OcenaResponseDTO;
+import com.busticket.app.model.entity.Grad;
 import com.busticket.app.model.entity.Korisnik;
 import com.busticket.app.model.entity.Ocena;
 import com.busticket.app.model.entity.Putovanje;
 import com.busticket.app.model.entity.enums.Role;
+import com.busticket.app.repository.GradRepository;
 import com.busticket.app.repository.KorisnikRepository;
 import com.busticket.app.repository.OcenaRepository;
 import com.busticket.app.repository.PutovanjeRepository;
@@ -40,6 +42,8 @@ public class OcenaServiceTest {
     private KorisnikRepository korisnikRepository;
     @Mock
     private PutovanjeRepository putovanjeRepository;
+    @Mock
+    private GradRepository gradRepository;
     @InjectMocks
     private OcenaService ocenaService;
 
@@ -57,6 +61,10 @@ public class OcenaServiceTest {
 
     @BeforeEach
     public void setup(){
+        Grad savedPolaziste = Grad.builder().naziv("Beograd").skracenica("BG").build();
+        gradRepository.save(savedPolaziste);
+        Grad savedOdrediste = Grad.builder().naziv("Nis").skracenica("NI").build();
+        gradRepository.save(savedOdrediste);
         savedKorisnik =  Korisnik.builder()
                 .ime("KorisnikIme")
                 .prezime("KorisnikPrezime")
@@ -66,8 +74,8 @@ public class OcenaServiceTest {
                 .role(Role.ADMIN)
                 .build();
         savedPutovanje = Putovanje.builder()
-                .polaziste("polaziste")
-                .odrediste("odrediste")
+                .polaziste(savedPolaziste)
+                .odrediste(savedOdrediste)
                 .vremePolaska(LocalDateTime.now())
                 .vremeDolaska(LocalDateTime.now().plusDays(4))
                 .osnovnaCena(100)

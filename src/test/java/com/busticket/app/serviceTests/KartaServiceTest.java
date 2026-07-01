@@ -4,11 +4,11 @@ import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.KartaMapper;
 import com.busticket.app.model.dto.request.KartaRequestDTO;
 import com.busticket.app.model.dto.response.KartaResponseDTO;
-import com.busticket.app.model.entity.Karta;
-import com.busticket.app.model.entity.Korisnik;
-import com.busticket.app.model.entity.Putovanje;
-import com.busticket.app.model.entity.Rezervacija;
+import com.busticket.app.model.entity.*;
+import com.busticket.app.model.entity.enums.NacinPlacanja;
 import com.busticket.app.model.entity.enums.Role;
+import com.busticket.app.model.entity.enums.StatusRezervacije;
+import com.busticket.app.model.entity.enums.TipKarte;
 import com.busticket.app.repository.KartaRepository;
 import com.busticket.app.repository.PutovanjeRepository;
 import com.busticket.app.repository.RezervacijaRepository;
@@ -48,9 +48,9 @@ public class KartaServiceTest {
     private Karta builderKarta() {
         return Karta.builder()
                 .brojSedista("W1")
-                .osnovnaCena(100)
                 .datumIzdavanja(LocalDateTime.now())
-                .tip("regular")
+                .tip(TipKarte.STANDARD)
+                .finalnaCena(1000)
                 .rezervacija(savedRezervacija)
                 .putovanje(savedPutovanje)
                 .build();
@@ -69,12 +69,12 @@ public class KartaServiceTest {
         savedRezervacija = Rezervacija.builder()
                 .datumKreiranja(LocalDateTime.now())
                 .ukupanIznos(100)
-                .nacinPlacanja("Kartica")
-                .status("pending")
+                .nacinPlacanja(NacinPlacanja.KARTICA)
+                .status(StatusRezervacije.AKTIVNA)
                 .korisnik(savedKorisnik).build();
         savedPutovanje = Putovanje.builder()
-                .polaziste("polaziste")
-                .odrediste("odrediste")
+                .polaziste(Grad.builder().naziv("Beograd").skracenica("BG").build())
+                .odrediste(Grad.builder().naziv("Nis").skracenica("NI").build())
                 .vremePolaska(LocalDateTime.now())
                 .vremeDolaska(LocalDateTime.now().plusDays(4))
                 .osnovnaCena(100)
@@ -113,8 +113,7 @@ public class KartaServiceTest {
     public void createKarta_Success() {
         KartaRequestDTO request = KartaRequestDTO.builder()
                 .brojSedista("W1")
-                .osnovnaCena(100)
-                .tip("regular")
+                .tip(TipKarte.STANDARD)
                 .rezervacijaId(1L)
                 .putovanjeId(1L)
                 .build();
@@ -133,8 +132,7 @@ public class KartaServiceTest {
     public void createKarta_ThrowsRezervacijaNotFound() {
         KartaRequestDTO request = KartaRequestDTO.builder()
                 .brojSedista("W1")
-                .osnovnaCena(100)
-                .tip("regular")
+                .tip(TipKarte.STANDARD)
                 .rezervacijaId(1L)
                 .putovanjeId(1L)
                 .build();
@@ -151,8 +149,7 @@ public class KartaServiceTest {
     public void createKarta_ThrowsPutovanjeNotFound(){
         KartaRequestDTO request = KartaRequestDTO.builder()
                 .brojSedista("W1")
-                .osnovnaCena(100)
-                .tip("regular")
+                .tip(TipKarte.STANDARD)
                 .rezervacijaId(1L)
                 .putovanjeId(1L)
                 .build();
@@ -168,17 +165,25 @@ public class KartaServiceTest {
     @Test
     public void updateKarta_Success() {
         Karta karta = builderKarta();
+        KartaRequestDTO dto = KartaRequestDTO.builder()
+                .brojSedista("2ad")
+                .tip(TipKarte.STANDARD)
+                .build();
         when(kartaRepository.findById(1L)).thenReturn(Optional.of(karta));
         when(kartaRepository.save(karta)).thenReturn(karta);
         when(kartaMapper.toResponse(karta)).thenReturn(new KartaResponseDTO());
-        KartaResponseDTO updated = kartaService.updateKarta(1L, "2ad", "regular");
+        KartaResponseDTO updated = kartaService.updateKarta(1L, dto);
         Assertions.assertThat(updated).isNotNull();
     }
 
     @Test
     public void updateKarta_ThrowsExceptionWhenNotFound() {
+        KartaRequestDTO dto = KartaRequestDTO.builder()
+                .brojSedista("2ad")
+                .tip(TipKarte.STANDARD)
+                .build();
         when(kartaRepository.findById(1L)).thenReturn(Optional.empty());
-        Assertions.assertThatThrownBy(() -> kartaService.updateKarta(1L, "2ad", "regular"))
+        Assertions.assertThatThrownBy(() -> kartaService.updateKarta(1L, dto))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("Karta nije pronadjena");
     }

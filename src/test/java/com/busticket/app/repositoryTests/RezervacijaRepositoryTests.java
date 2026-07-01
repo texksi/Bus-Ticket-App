@@ -3,7 +3,9 @@ package com.busticket.app.repositoryTests;
 import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.model.entity.Korisnik;
 import com.busticket.app.model.entity.Rezervacija;
+import com.busticket.app.model.entity.enums.NacinPlacanja;
 import com.busticket.app.model.entity.enums.Role;
+import com.busticket.app.model.entity.enums.StatusRezervacije;
 import com.busticket.app.repository.KorisnikRepository;
 import com.busticket.app.repository.RezervacijaRepository;
 import org.assertj.core.api.Assertions;
@@ -30,8 +32,8 @@ public class RezervacijaRepositoryTests {
         return Rezervacija.builder()
                 .datumKreiranja(LocalDateTime.now())
                 .ukupanIznos(100)
-                .nacinPlacanja("Kartica")
-                .status("pending")
+                .nacinPlacanja(NacinPlacanja.KARTICA)
+                .status(StatusRezervacije.AKTIVNA)
                 .korisnik(savedKorisnik).build();
     }
 
@@ -72,9 +74,9 @@ public class RezervacijaRepositoryTests {
     @Test
     public void updateRezervacijaTest(){
         Rezervacija saved = rezervacijaRepository.save(builderRezervacija());
-        saved.setNacinPlacanja("GOTOVINA");
+        saved.setNacinPlacanja(NacinPlacanja.GOTOVINA);
         Rezervacija updated = rezervacijaRepository.save(saved);
-        Assertions.assertThat(updated.getNacinPlacanja()).isEqualTo("GOTOVINA");
+        Assertions.assertThat(updated.getNacinPlacanja()).isEqualTo(NacinPlacanja.GOTOVINA);
     }
 
     @Test
