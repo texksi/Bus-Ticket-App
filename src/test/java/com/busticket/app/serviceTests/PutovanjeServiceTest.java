@@ -4,9 +4,11 @@ import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.PutovanjeMapper;
 import com.busticket.app.model.dto.request.PutovanjeRequestDTO;
 import com.busticket.app.model.dto.response.PutovanjeResponseDTO;
+import com.busticket.app.model.entity.Grad;
 import com.busticket.app.model.entity.Kompanija;
 import com.busticket.app.model.entity.Putovanje;
 import com.busticket.app.model.entity.Vozilo;
+import com.busticket.app.repository.GradRepository;
 import com.busticket.app.repository.KompanijaRepository;
 import com.busticket.app.repository.PutovanjeRepository;
 import com.busticket.app.repository.VoziloRepository;
@@ -38,15 +40,19 @@ public class PutovanjeServiceTest {
     private VoziloRepository voziloRepository;
     @Mock
     private KompanijaRepository kompanijaRepository;
+    @Mock
+    private GradRepository gradRepository;
     @InjectMocks
     private PutovanjeService putovanjeService;
     private Vozilo savedVozilo;
     private Kompanija savedKompanija;
 
     private Putovanje builderPutovanje() {
+        Grad polaziste = Grad.builder().naziv("Beograd").skracenica("BG").build();
+        Grad odrediste = Grad.builder().naziv("Nis").skracenica("NI").build();
         return Putovanje.builder()
-                .polaziste("polaziste")
-                .odrediste("odrediste")
+                .polaziste(polaziste)
+                .odrediste(odrediste)
                 .vremePolaska(LocalDateTime.now())
                 .vremeDolaska(LocalDateTime.now().plusDays(4))
                 .osnovnaCena(100)
@@ -99,8 +105,8 @@ public class PutovanjeServiceTest {
     @Test
     public void createPutovanje_Success() {
         PutovanjeRequestDTO putovanjeRequestDTO = PutovanjeRequestDTO.builder()
-                .polaziste("polaziste")
-                .odrediste("odrediste")
+                .polazisteId(1L)
+                .odredisteId(2L)
                 .vremePolaska(LocalDateTime.now())
                 .vremeDolaska(LocalDateTime.now().plusDays(4))
                 .osnovnaCena(100)
@@ -110,6 +116,10 @@ public class PutovanjeServiceTest {
         Putovanje putovanje = builderPutovanje();
         when(voziloRepository.findById(1L)).thenReturn(Optional.of(savedVozilo));
         when(kompanijaRepository.findById(1L)).thenReturn(Optional.of(savedKompanija));
+        Grad polaziste = Grad.builder().naziv("Beograd").skracenica("BG").build();
+        Grad odrediste = Grad.builder().naziv("Nis").skracenica("NI").build();
+        when(gradRepository.findById(1L)).thenReturn(Optional.of(polaziste));
+        when(gradRepository.findById(2L)).thenReturn(Optional.of(odrediste));
         when(putovanjeMapper.toEntity(putovanjeRequestDTO)).thenReturn(putovanje);
         when(putovanjeRepository.save(putovanje)).thenReturn(putovanje);
         when(putovanjeMapper.toResponse(putovanje)).thenReturn(new PutovanjeResponseDTO());
@@ -121,8 +131,8 @@ public class PutovanjeServiceTest {
     @Test
     public void createPutovanje_ThrowsExceptionWhenVoziloNotFound() {
         PutovanjeRequestDTO putovanjeRequestDTO = PutovanjeRequestDTO.builder()
-                .polaziste("polaziste")
-                .odrediste("odrediste")
+                .polazisteId(1L)
+                .odredisteId(2L)
                 .vremePolaska(LocalDateTime.now())
                 .vremeDolaska(LocalDateTime.now().plusDays(4))
                 .osnovnaCena(100)
@@ -138,8 +148,8 @@ public class PutovanjeServiceTest {
     @Test
     public void createPutovanje_ThrowsExceptionWhenKompanijaNotFound() {
         PutovanjeRequestDTO putovanjeRequestDTO = PutovanjeRequestDTO.builder()
-                .polaziste("polaziste")
-                .odrediste("odrediste")
+                .polazisteId(1L)
+                .odredisteId(2L)
                 .vremePolaska(LocalDateTime.now())
                 .vremeDolaska(LocalDateTime.now().plusDays(4))
                 .osnovnaCena(100)
@@ -155,20 +165,37 @@ public class PutovanjeServiceTest {
 
     @Test
     public void updatePutovanje_Success() {
+        Grad polaziste = Grad.builder().naziv("Beograd").skracenica("BG").build();
+        Grad odrediste = Grad.builder().naziv("Nis").skracenica("NI").build();
+        PutovanjeRequestDTO dto = PutovanjeRequestDTO.builder()
+                .polazisteId(1L)
+                .odredisteId(2L)
+                .vremePolaska(LocalDateTime.now().plusDays(2))
+                .vremeDolaska(LocalDateTime.now().plusDays(5))
+                .osnovnaCena(100)
+                .build();
         Putovanje putovanje = builderPutovanje();
         when(putovanjeRepository.findById(1L)).thenReturn(Optional.of(putovanje));
+        when(gradRepository.findById(1L)).thenReturn(Optional.of(polaziste));
+        when(gradRepository.findById(2L)).thenReturn(Optional.of(odrediste));
         when(putovanjeRepository.save(putovanje)).thenReturn(putovanje);
         when(putovanjeMapper.toResponse(putovanje)).thenReturn(new PutovanjeResponseDTO());
-        PutovanjeResponseDTO updated = putovanjeService.updatePutovanje(1L, "polaziste2", "odredostr2",
-                LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(5), 100);
+        PutovanjeResponseDTO updated = putovanjeService.updatePutovanje(1L, dto);
         Assertions.assertThat(updated).isNotNull();
     }
 
+
     @Test
     public void updatePutovanje_ThrowsExceptionWhenNotFound() {
+        PutovanjeRequestDTO dto = PutovanjeRequestDTO.builder()
+                .polazisteId(1L)
+                .odredisteId(2L)
+                .vremePolaska(LocalDateTime.now().plusDays(2))
+                .vremeDolaska(LocalDateTime.now().plusDays(5))
+                .osnovnaCena(100)
+                .build();
         when(putovanjeRepository.findById(1L)).thenReturn(Optional.empty());
-        Assertions.assertThatThrownBy(() -> putovanjeService.updatePutovanje(1L, "polaziste2", "odredostr2",
-                        LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(5), 100))
+        Assertions.assertThatThrownBy(() -> putovanjeService.updatePutovanje(1L, dto))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("Putovanje nije pronadjeno");
     }

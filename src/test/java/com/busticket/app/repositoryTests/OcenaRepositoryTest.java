@@ -1,9 +1,11 @@
 package com.busticket.app.repositoryTests;
 
+import com.busticket.app.model.entity.Grad;
 import com.busticket.app.model.entity.Korisnik;
 import com.busticket.app.model.entity.Ocena;
 import com.busticket.app.model.entity.Putovanje;
 import com.busticket.app.model.entity.enums.Role;
+import com.busticket.app.repository.GradRepository;
 import com.busticket.app.repository.KorisnikRepository;
 import com.busticket.app.repository.OcenaRepository;
 import com.busticket.app.repository.PutovanjeRepository;
@@ -27,6 +29,8 @@ public class OcenaRepositoryTest {
     private KorisnikRepository korisnikRepository;
     @Autowired
     private PutovanjeRepository putovanjeRepository;
+    @Autowired
+    private GradRepository gradRepository;
     private Korisnik savedKorisnik;
     private Putovanje savedPutovanje;
 
@@ -51,9 +55,19 @@ public class OcenaRepositoryTest {
                 .role(Role.ADMIN)
                 .build();
         korisnikRepository.save(savedKorisnik);
+        Grad savedPolaziste = Grad.builder()
+                .naziv("Beograd")
+                .skracenica("BG")
+                .build();
+        gradRepository.save(savedPolaziste);
+        Grad savedOdrediste = Grad.builder()
+                .naziv("Nis")
+                .skracenica("NI")
+                .build();
+        gradRepository.save(savedOdrediste);
         savedPutovanje = Putovanje.builder()
-                .polaziste("polaziste")
-                .odrediste("odrediste")
+                .polaziste(savedPolaziste)
+                .odrediste(savedOdrediste)
                 .vremePolaska(LocalDateTime.now())
                 .vremeDolaska(LocalDateTime.now().plusDays(4))
                 .osnovnaCena(100)

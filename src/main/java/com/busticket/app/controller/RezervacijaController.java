@@ -5,6 +5,7 @@ import com.busticket.app.model.dto.response.KartaResponseDTO;
 import com.busticket.app.model.dto.response.RezervacijaResponseDTO;
 import com.busticket.app.service.KartaService;
 import com.busticket.app.service.RezervacijaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -62,7 +63,7 @@ public class RezervacijaController {
      * @return ResponseEntity sa RezervacijaResponseDTO objektom i HTTP statusom 201
      */
     @PostMapping("/api/rezervacije")
-    public ResponseEntity<RezervacijaResponseDTO> createRezervacija(@RequestBody RezervacijaRequestDTO rezervacija) {
+    public ResponseEntity<RezervacijaResponseDTO> createRezervacija(@Valid @RequestBody RezervacijaRequestDTO rezervacija) {
         return ResponseEntity.status(201).body(rezervacijaService.createRezervacija(rezervacija));
     }
 
@@ -74,10 +75,9 @@ public class RezervacijaController {
      * @return ResponseEntity sa RezervacijaResponseDTO objektom i HTTP statusom 200
      */
     @PutMapping("/api/rezervacije/{id}")
-    public ResponseEntity<RezervacijaResponseDTO> updateRezervacija(@RequestBody RezervacijaRequestDTO rezervacija,
+    public ResponseEntity<RezervacijaResponseDTO> updateRezervacija(@Valid @RequestBody RezervacijaRequestDTO rezervacija,
                                                                     @PathVariable Long id) {
-        return ResponseEntity.ok(rezervacijaService.updateRezervacija(id, rezervacija.getStatus(),
-                rezervacija.getNacinPlacanja(), rezervacija.getUkupanIznos()));
+        return ResponseEntity.ok(rezervacijaService.updateRezervacija(id, rezervacija));
     }
 
     /**
