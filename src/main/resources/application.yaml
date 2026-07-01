@@ -18,3 +18,7 @@ stripe:
 springdoc:
   swagger-ui:
     url: /openapi.yaml
+jwt:
+  secret: your-secret-key-base64-encoded
+  audience: bus-ticket-app
+  issuer: bus-ticket-app
