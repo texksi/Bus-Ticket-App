@@ -76,19 +76,16 @@ public class RezervacijaService {
      * azurira njene podatke, u slucaju da rezervacija sa tim ID-om ne postoji metoda baca custom Exception i prekida se njen rad,
      *
      * @param id - jedinstveni indetifikator koji se korisiti za pronalazenje rezervacije koju treba azurirati
-     * @param status - parametar za promenu statusa
-     * @param nacinPlacanja - parametar za promenu nacina placanja
-     * @param ukupanIznos - parametar za promenu ukupnog iznosa
+     * @param dto - ojbekat rezervazija za azuriranje
      * @return RezervacijaResponseDTO - objekat koji vraca azuriranu rezervaciju sa svim njenim podacima
      * @throws EntityNotFoundException - ukoliko rezervacija sa datim ID-om ne postoji u sistemu, baca se izuzetak
      * sa porukom "Rezervacija nije pronadjena"
      */
-    public RezervacijaResponseDTO updateRezervacija(Long id, String status, String nacinPlacanja, double ukupanIznos){
+    public RezervacijaResponseDTO updateRezervacija(Long id, RezervacijaRequestDTO dto){
         Rezervacija savedRezervacija = rezervacijaRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(REZERVACIJA_NOT_FOUND));
-        savedRezervacija.setStatus(status);
-        savedRezervacija.setNacinPlacanja(nacinPlacanja);
-        savedRezervacija.setUkupanIznos(ukupanIznos);
+        savedRezervacija.setStatus(dto.getStatus());
+        savedRezervacija.setNacinPlacanja(dto.getNacinPlacanja());
         Rezervacija rezervacija = rezervacijaRepository.save(savedRezervacija);
         return rezervacijaMapper.toResponse(rezervacija);
     }

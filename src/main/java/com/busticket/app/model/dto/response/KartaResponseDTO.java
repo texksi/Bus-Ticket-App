@@ -1,5 +1,6 @@
 package com.busticket.app.model.dto.response;
 
+import com.busticket.app.model.entity.enums.TipKarte;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -13,9 +14,9 @@ public class KartaResponseDTO {
 
     private Long id;
     private String brojSedista;
-    private double osnovnaCena;
     private LocalDateTime datumIzdavanja;
-    private String tip;
+    private TipKarte tip;
+    private double finalnaCena;
     private Long rezervacijaId;
     private Long putovanjeId;
 }

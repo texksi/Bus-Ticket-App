@@ -5,6 +5,7 @@ import com.busticket.app.model.dto.response.OcenaResponseDTO;
 import com.busticket.app.model.dto.response.PutovanjeResponseDTO;
 import com.busticket.app.service.OcenaService;
 import com.busticket.app.service.PutovanjeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -62,7 +63,7 @@ public class PutovanjeController {
      * @return ResponseEntity sa PutovanjeResponseDTO objektom i HTTP statusom 201
      */
     @PostMapping("/api/putovanja")
-    public ResponseEntity<PutovanjeResponseDTO> createPutovanje(@RequestBody PutovanjeRequestDTO putovanje) {
+    public ResponseEntity<PutovanjeResponseDTO> createPutovanje(@Valid @RequestBody PutovanjeRequestDTO putovanje) {
         return ResponseEntity.status(201).body(putovanjeService.createPutovanje(putovanje));
     }
 
@@ -74,11 +75,9 @@ public class PutovanjeController {
      * @return ResponseEntity sa PutovanjeResponseDTO objektom i HTTP statusom 200
      */
     @PutMapping("/api/putovanja/{id}")
-    public ResponseEntity<PutovanjeResponseDTO> updatePutovanje(@RequestBody PutovanjeRequestDTO putovanje,
+    public ResponseEntity<PutovanjeResponseDTO> updatePutovanje(@Valid @RequestBody PutovanjeRequestDTO putovanje,
                                                                 @PathVariable Long id) {
-        return ResponseEntity.ok(putovanjeService.updatePutovanje(id, putovanje.getPolaziste(),
-                putovanje.getOdrediste(), putovanje.getVremePolaska(), putovanje.getVremeDolaska(),
-                putovanje.getOsnovnaCena()));
+        return ResponseEntity.ok(putovanjeService.updatePutovanje(id, putovanje));
     }
 
     /**

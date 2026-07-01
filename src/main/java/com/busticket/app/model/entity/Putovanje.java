@@ -2,6 +2,7 @@ package com.busticket.app.model.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
 
@@ -32,15 +33,15 @@ public class Putovanje {
     /**
      * Mesto polaska putovanja
      */
-    @Column(name = "polaziste", nullable = false)
-    @NotBlank
-    private String polaziste;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "polaziste_id", nullable = false)
+    private Grad polaziste;
     /**
      * Mesto odredista putovanja
      */
-    @Column(name = "odrediste", nullable = false)
-    @NotBlank
-    private String odrediste;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "odrediste_id", nullable = false)
+    private Grad odrediste;
     /**
      * Vreme polaska putovanja
      */
@@ -80,7 +81,7 @@ public class Putovanje {
     /**
      * Vozilo koje se koristi za putovanje
      */
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vozilo_id")
     private Vozilo vozilo;
 }

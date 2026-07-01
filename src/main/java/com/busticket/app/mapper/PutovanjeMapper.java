@@ -11,6 +11,8 @@ public interface PutovanjeMapper {
 
     @Mapping(source = "kompanija.id", target = "kompanijaId")
     @Mapping(source = "vozilo.id", target = "voziloId")
+    @Mapping(source = "polaziste.id", target = "polazisteId")
+    @Mapping(source = "odrediste.id", target = "odredisteId")
     PutovanjeResponseDTO toResponse(Putovanje putovanje);
 
     Putovanje toEntity(PutovanjeRequestDTO requestDTO);
