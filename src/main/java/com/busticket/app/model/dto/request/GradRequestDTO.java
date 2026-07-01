@@ -8,11 +8,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class KompanijaRequestDTO {
+public class GradRequestDTO {
 
-    @NotBlank(message = "Naziv kompanije je obavezan")
+    @NotBlank(message = "Naziv grada je obavezan")
     private String naziv;
-    @NotBlank(message = "Kontakt kompanije je obavezan")
-    private String kontakt;
-
+    @NotBlank(message = "Skracenica za grad je obavezna")
+    private String skracenica;
 }

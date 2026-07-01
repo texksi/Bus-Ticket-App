@@ -1,5 +1,7 @@
 package com.busticket.app.model.entity;
 
+import com.busticket.app.model.entity.enums.NacinPlacanja;
+import com.busticket.app.model.entity.enums.StatusRezervacije;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -45,14 +47,14 @@ public class Rezervacija {
      * Nacin placanja
      */
     @Column(name = "nacin_placanja", nullable = false)
-    @NotBlank
-    private String nacinPlacanja;
+    @Enumerated(EnumType.STRING)
+    private NacinPlacanja nacinPlacanja;
     /**
      * Status rezervacije
      */
     @Column(name = "status", nullable = false)
-    @NotBlank
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private StatusRezervacije status;
     /**
      * Korisnik koji je napravio rezervaciju
      */

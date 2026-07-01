@@ -1,5 +1,6 @@
 package com.busticket.app.model.entity;
 
+import com.busticket.app.model.entity.enums.TipKarte;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -36,9 +37,9 @@ public class Karta {
     /**
      * Osnovna cena karte
      */
-    @Column(name = "osnovna_cena", nullable = false)
+    @Column(name = "finalna_cena", nullable = false)
     @Positive
-    private double osnovnaCena;
+    private double finalnaCena;
     /**
      * Datum i vreme izdavanja karte
      */
@@ -49,8 +50,8 @@ public class Karta {
      * Tip karte (student,regular...)
      */
     @Column(name = "tip", nullable = false)
-    @NotBlank
-    private String tip;
+    @Enumerated(EnumType.STRING)
+    private TipKarte tip;
     /**
      * Rezervacija za koju je karta izdata
      */

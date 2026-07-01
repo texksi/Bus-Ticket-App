@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 public class PutovanjeResponseDTO {
 
     private Long id;
-    private String polaziste;
-    private String odrediste;
+    private Long polazisteId;
+    private Long odredisteId;
     private LocalDateTime vremePolaska;
     private LocalDateTime vremeDolaska;
     private double osnovnaCena;

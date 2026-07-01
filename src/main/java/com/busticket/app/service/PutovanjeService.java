@@ -4,9 +4,11 @@ import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.PutovanjeMapper;
 import com.busticket.app.model.dto.request.PutovanjeRequestDTO;
 import com.busticket.app.model.dto.response.PutovanjeResponseDTO;
+import com.busticket.app.model.entity.Grad;
 import com.busticket.app.model.entity.Kompanija;
 import com.busticket.app.model.entity.Putovanje;
 import com.busticket.app.model.entity.Vozilo;
+import com.busticket.app.repository.GradRepository;
 import com.busticket.app.repository.KompanijaRepository;
 import com.busticket.app.repository.PutovanjeRepository;
 import com.busticket.app.repository.VoziloRepository;
@@ -29,6 +31,7 @@ public class PutovanjeService {
     private final PutovanjeMapper putovanjeMapper;
     private final VoziloRepository voziloRepository;
     private final KompanijaRepository kompanijaRepository;
+    private final GradRepository gradRepository;
     private static final String PUTOVANJE_NOT_FOUND = "Putovanje nije pronadjeno";
 
     /**
@@ -75,9 +78,15 @@ public class PutovanjeService {
         Kompanija kompanija = kompanijaRepository.findById(newPutovanje.getKompanijaId()).orElseThrow(
                 () -> new EntityNotFoundException("Kompanija nije pronadjena")
         );
+        Grad polaziste = gradRepository.findById(newPutovanje.getPolazisteId())
+                .orElseThrow(() -> new EntityNotFoundException("Polaziste nije pronadjeno"));
+        Grad odrediste = gradRepository.findById(newPutovanje.getOdredisteId())
+                .orElseThrow(() -> new EntityNotFoundException("Odrediste nije pronadjeno"));
         Putovanje putovanje = putovanjeMapper.toEntity(newPutovanje);
         putovanje.setVozilo(vozilo);
         putovanje.setKompanija(kompanija);
+        putovanje.setPolaziste(polaziste);
+        putovanje.setOdrediste(odrediste);
         Putovanje saved = putovanjeRepository.save(putovanje);
         return putovanjeMapper.toResponse(saved);
     }
@@ -87,24 +96,24 @@ public class PutovanjeService {
      * vrednosti, u slucaju da putovanje sa tim ID-om ne postoji metoda baca custom Exception i prekida se njen rad
      *
      * @param id           - jedinstveni indetifikator koji se korisiti za pronalazenje putovanja kojeg treba azurirati
-     * @param polaziste    - parametar za promenu polazista
-     * @param odrediste    - parametar za promenu odredista
-     * @param vremePolaska - parametar za promenu vremena polaska
-     * @param vremeDolaska - parametar za promenu vremena dolaska
-     * @param osnovnaCena  - parametar za promenu osnovne cene
+     * @param dto - objekat putovanje za azuriranje
      * @return PutovanjeResponseDTO - objekat koji vraca azurirano putovanje sa svim njegovim podacima
      * @throws EntityNotFoundException - ukoliko putovanje sa datim ID-om ne postoji u sistemu, baca se izuzetak
      *                                 sa porukom "Putovanje nije pronadjeno"
      */
-    public PutovanjeResponseDTO updatePutovanje(Long id, String polaziste, String odrediste, LocalDateTime vremePolaska, LocalDateTime vremeDolaska, double osnovnaCena) {
+    public PutovanjeResponseDTO updatePutovanje(Long id,PutovanjeRequestDTO dto) {
         Putovanje savedPutovanje = putovanjeRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(PUTOVANJE_NOT_FOUND)
         );
+        Grad polaziste = gradRepository.findById(dto.getPolazisteId())
+                .orElseThrow(() -> new EntityNotFoundException("Polaziste nije pronadjeno"));
+        Grad odrediste = gradRepository.findById(dto.getOdredisteId())
+                .orElseThrow(() -> new EntityNotFoundException("Odrediste nije pronadjeno"));
         savedPutovanje.setPolaziste(polaziste);
         savedPutovanje.setOdrediste(odrediste);
-        savedPutovanje.setVremePolaska(vremePolaska);
-        savedPutovanje.setVremeDolaska(vremeDolaska);
-        savedPutovanje.setOsnovnaCena(osnovnaCena);
+        savedPutovanje.setVremePolaska(dto.getVremePolaska());
+        savedPutovanje.setVremeDolaska(dto.getVremeDolaska());
+        savedPutovanje.setOsnovnaCena(dto.getOsnovnaCena());
         Putovanje putovanje = putovanjeRepository.save(savedPutovanje);
         return putovanjeMapper.toResponse(putovanje);
     }

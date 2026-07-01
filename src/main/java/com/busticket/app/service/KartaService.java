@@ -76,6 +76,8 @@ public class KartaService {
                 () -> new EntityNotFoundException("Putovanje nije pronadjeno")
         );
         karta.setPutovanje(putovanje);
+        double finalnaCena = putovanje.getOsnovnaCena() * newKarta.getTip().getKoeficijent();
+        karta.setFinalnaCena(finalnaCena);
         Karta saved = kartaRepository.save(karta);
         return kartaMapper.toResponse(saved);
     }
@@ -85,17 +87,16 @@ public class KartaService {
      * vrednosti, u slucaju da karta sa tim ID-om ne postoji metoda baca custom Exception i prekida se njen rad
      *
      * @param id          - jedinstveni indetifikator koji se korisiti za pronalazenje karte koju treba azurirati
-     * @param brojSedista - parametar za promenu brojaSedista
-     * @param tip         - parametar za promenu tipa karte
+     * @param dto - karta objekat za azuriranje
      * @return KartaResponseDTO - objekat koji vraca azuriranu kartu sa svim njenim podacima
      * @throws EntityNotFoundException - ukoliko karta sa datim ID-om ne postoji u sistemu, baca se izuzetak
      *                                 sa porukom "Karta nije pronadjena"
      */
-    public KartaResponseDTO updateKarta(Long id, String brojSedista, String tip) {
+    public KartaResponseDTO updateKarta(Long id, KartaRequestDTO dto) {
         Karta savedKarta = kartaRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(KARTA_NOT_FOUND));
-        savedKarta.setBrojSedista(brojSedista);
-        savedKarta.setTip(tip);
+        savedKarta.setBrojSedista(dto.getBrojSedista());
+        savedKarta.setTip(dto.getTip());
         Karta karta = kartaRepository.save(savedKarta);
         return kartaMapper.toResponse(karta);
     }

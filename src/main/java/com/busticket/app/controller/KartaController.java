@@ -3,6 +3,7 @@ package com.busticket.app.controller;
 import com.busticket.app.model.dto.request.KartaRequestDTO;
 import com.busticket.app.model.dto.response.KartaResponseDTO;
 import com.busticket.app.service.KartaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,7 +50,7 @@ public class KartaController {
      * @return ResponseEntity sa KartaResponseDTO objektom i HTTP statusom 201
      */
     @PostMapping("/api/karte")
-    public ResponseEntity<KartaResponseDTO> createKarta(@RequestBody KartaRequestDTO karta) {
+    public ResponseEntity<KartaResponseDTO> createKarta(@Valid @RequestBody KartaRequestDTO karta) {
         return ResponseEntity.status(201).body(kartaService.createKarta(karta));
     }
 
@@ -61,8 +62,8 @@ public class KartaController {
      * @return ResponseEntity sa KartaResponseDTO objektom i HTTP statusom 200
      */
     @PutMapping("/api/karte/{id}")
-    public ResponseEntity<KartaResponseDTO> updateKarta(@RequestBody KartaRequestDTO karta, @PathVariable Long id) {
-        return ResponseEntity.ok(kartaService.updateKarta(id, karta.getBrojSedista(), karta.getTip()));
+    public ResponseEntity<KartaResponseDTO> updateKarta(@Valid @RequestBody KartaRequestDTO karta, @PathVariable Long id) {
+        return ResponseEntity.ok(kartaService.updateKarta(id, karta));
     }
 
     /**
