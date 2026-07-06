@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import AdminSidebar from "../components/layout/AdminSidebar";
 import api from "../api/api";
@@ -23,22 +22,27 @@ export default function AdminPutovanjaPage() {
     voziloId: "",
   });
 
-  useEffect(() => {
-    Promise.all([
-      api.get("/api/putovanja"),
-      api.get("/api/gradovi"),
-      api.get("/api/kompanije"),
-      api.get("/api/vozila"),
-    ]).then(([put, grad, komp, voz]) => {
-      setPutovanja(put.data);
-      setGradovi(grad.data);
-      setKompanije(komp.data);
-      setVozila(voz.data);
-    }).finally(() => setLoading(false));
-  }, []);
+ useEffect(() => {
+  Promise.all([
+    api.get("/api/putovanja"),
+    api.get("/api/gradovi"),
+    api.get("/api/kompanije"),
+    api.get("/api/vozila"),
+  ]).then(([put, grad, komp, voz]) => {
+    console.log("putovanja:", put.data);
+    console.log("gradovi:", grad.data);
+    console.log("kompanije:", komp.data);
+    console.log("vozila:", voz.data);
+    setPutovanja(put.data);
+    setGradovi(grad.data);
+    setKompanije(komp.data);
+    setVozila(voz.data);
+  }).catch((e) => console.error("Greška:", e))
+  .finally(() => setLoading(false));
+}, []);
 
-  const getGradNaziv = (id) => gradovi.find((g) => g.id === id)?.naziv || "";
-  const getKompanijaNaziv = (id) => kompanije.find((k) => k.id === id)?.naziv || "";
+  const getGradNaziv = (id) => gradovi.find((g) => g.id === Number(id))?.naziv || "";
+  const getKompanijaNaziv = (id) => kompanije.find((k) => k.id === Number(id))?.naziv || "";
 
   const formatVreme = (dateStr) => {
     if (!dateStr) return "";
@@ -57,27 +61,43 @@ export default function AdminPutovanjaPage() {
     if (putovanje) {
       setEditPutovanje(putovanje);
       setForma({
-        polazisteId: putovanje.polazisteId,
-        odredisteId: putovanje.odredisteId,
+        polazisteId: String(putovanje.polazisteId),
+        odredisteId: String(putovanje.odredisteId),
         vremePolaska: putovanje.vremePolaska?.slice(0, 16) || "",
         vremeDolaska: putovanje.vremeDolaska?.slice(0, 16) || "",
-        osnovnaCena: putovanje.osnovnaCena,
-        kompanijaId: putovanje.kompanijaId,
-        voziloId: putovanje.voziloId,
+        osnovnaCena: String(putovanje.osnovnaCena),
+        kompanijaId: String(putovanje.kompanijaId),
+        voziloId: String(putovanje.voziloId),
       });
     } else {
       setEditPutovanje(null);
-      setForma({ polazisteId: "", odredisteId: "", vremePolaska: "", vremeDolaska: "", osnovnaCena: "", kompanijaId: "", voziloId: "" });
+      setForma({
+        polazisteId: "",
+        odredisteId: "",
+        vremePolaska: "",
+        vremeDolaska: "",
+        osnovnaCena: "",
+        kompanijaId: "",
+        voziloId: "",
+      });
     }
     setModalOtvoren(true);
   };
 
   const handleSacuvaj = async () => {
     try {
+      const payload = {
+        ...forma,
+        polazisteId: Number(forma.polazisteId),
+        odredisteId: Number(forma.odredisteId),
+        kompanijaId: Number(forma.kompanijaId),
+        voziloId: Number(forma.voziloId),
+        osnovnaCena: Number(forma.osnovnaCena),
+      };
       if (editPutovanje) {
-        await api.put(`/api/putovanja/${editPutovanje.id}`, forma);
+        await api.put(`/api/putovanja/${editPutovanje.id}`, payload);
       } else {
-        await api.post("/api/putovanja", forma);
+        await api.post("/api/putovanja", payload);
       }
       const res = await api.get("/api/putovanja");
       setPutovanja(res.data);
@@ -111,7 +131,6 @@ export default function AdminPutovanjaPage() {
         <Navbar />
 
         <div className="flex-1 p-8">
-          {/* HEADER */}
           <div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-[#1a237e] text-xl font-medium">Putovanja</h1>
@@ -125,7 +144,6 @@ export default function AdminPutovanjaPage() {
             </button>
           </div>
 
-          {/* TOOLBAR */}
           <div className="flex gap-3 mb-4">
             <input
               type="text"
@@ -136,7 +154,6 @@ export default function AdminPutovanjaPage() {
             />
           </div>
 
-          {/* TABELA */}
           <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
             <table className="w-full border-collapse">
               <thead>
@@ -199,7 +216,6 @@ export default function AdminPutovanjaPage() {
         </div>
       </div>
 
-      {/* MODAL */}
       {modalOtvoren && (
         <div className="fixed inset-0 bg-black/35 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl w-[500px] p-8">
