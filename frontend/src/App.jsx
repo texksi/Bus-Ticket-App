@@ -8,6 +8,12 @@ import AdminPutovanjaPage from "./pages/AdminPutovanja";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import AdminKartePage from "./pages/AdminKarta";
 import AdminGradoviPage from "./pages/AdminGradovi";
+import AdminVozilaPage from "./pages/AdminVozila";
+import AdminKompanijaPage from "./pages/AdminKompanija";
+import AdminKorisniciPage from "./pages/AdminKorisnici";
+import AdminRezervacijePage from "./pages/AdminRezervacije";
+import AdminOcenePage from "./pages/AdminOcene";
+import AdminPlacanjaPage from "./pages/AdminPlacanja";
 
 function ProtectedAdminRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -35,6 +41,12 @@ export default function App() {
         <Route path="/admin/putovanja" element={<ProtectedAdminRoute><AdminPutovanjaPage /></ProtectedAdminRoute>} />
         <Route path="/admin/karte" element={<ProtectedAdminRoute><AdminKartePage /></ProtectedAdminRoute>} />
         <Route path="/admin/gradovi" element={<ProtectedAdminRoute><AdminGradoviPage /></ProtectedAdminRoute>} />
+        <Route path="/admin/vozila" element={<ProtectedAdminRoute><AdminVozilaPage /></ProtectedAdminRoute>} />
+        <Route path="/admin/kompanije" element={<ProtectedAdminRoute><AdminKompanijaPage /></ProtectedAdminRoute>} />
+        <Route path="/admin/korisnici" element={<ProtectedAdminRoute><AdminKorisniciPage /></ProtectedAdminRoute>} />
+        <Route path="/admin/rezervacije" element={<ProtectedAdminRoute><AdminRezervacijePage /></ProtectedAdminRoute>} />
+        <Route path="/admin/ocene" element={<ProtectedAdminRoute><AdminOcenePage /></ProtectedAdminRoute>} />
+        <Route path="/admin/placanja" element={<ProtectedAdminRoute><AdminPlacanjaPage /></ProtectedAdminRoute>} />
       </Routes>
     </BrowserRouter>
   );
