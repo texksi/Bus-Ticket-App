@@ -94,6 +94,11 @@ public class KorisnikController {
                 korisnik.getEmail(), korisnik.getIme(), korisnik.getPrezime()));
     }
 
+    @PutMapping("api/korisnici/{id}/role")
+    public ResponseEntity<KorisnikResponseDTO> updateRole(@PathVariable Long id, @RequestParam String role) {
+        return ResponseEntity.ok(korisnikService.updateRole(id, role));
+    }
+
     /**
      * Metoda koja brise korisnika iz sistema na osnovu prosledjenog ID-a
      *

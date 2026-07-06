@@ -6,6 +6,7 @@ import com.busticket.app.mapper.KorisnikMapper;
 import com.busticket.app.model.dto.request.KorisnikRequestDTO;
 import com.busticket.app.model.dto.response.KorisnikResponseDTO;
 import com.busticket.app.model.entity.Korisnik;
+import com.busticket.app.model.entity.enums.Role;
 import com.busticket.app.repository.KorisnikRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -131,5 +132,12 @@ public class KorisnikService {
                 () -> new EntityNotFoundException(KORISNIK_NOT_FOUND)
         );
         korisnikRepository.deleteById(id);
+    }
+
+    public KorisnikResponseDTO updateRole(Long id, String role) {
+        Korisnik korisnik = korisnikRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(KORISNIK_NOT_FOUND));
+        korisnik.setRole(Role.valueOf(role));
+        return korisnikMapper.toResponse(korisnikRepository.save(korisnik));
     }
 }
