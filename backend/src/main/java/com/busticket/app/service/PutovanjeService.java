@@ -72,21 +72,24 @@ public class PutovanjeService {
      *                                 porukom "Vozilo nije pronadjeno"/"Kompanija nije pronadjena"
      */
     public PutovanjeResponseDTO createPutovanje(PutovanjeRequestDTO newPutovanje) {
-        Vozilo vozilo = voziloRepository.findById(newPutovanje.getVoziloId()).orElseThrow(
-                () -> new EntityNotFoundException("Vozilo nije pronadjeno")
-        );
-        Kompanija kompanija = kompanijaRepository.findById(newPutovanje.getKompanijaId()).orElseThrow(
-                () -> new EntityNotFoundException("Kompanija nije pronadjena")
-        );
+        Vozilo vozilo = voziloRepository.findById(newPutovanje.getVoziloId())
+                .orElseThrow(() -> new EntityNotFoundException("Vozilo nije pronadjeno"));
+        Kompanija kompanija = kompanijaRepository.findById(newPutovanje.getKompanijaId())
+                .orElseThrow(() -> new EntityNotFoundException("Kompanija nije pronadjena"));
         Grad polaziste = gradRepository.findById(newPutovanje.getPolazisteId())
                 .orElseThrow(() -> new EntityNotFoundException("Polaziste nije pronadjeno"));
         Grad odrediste = gradRepository.findById(newPutovanje.getOdredisteId())
                 .orElseThrow(() -> new EntityNotFoundException("Odrediste nije pronadjeno"));
-        Putovanje putovanje = putovanjeMapper.toEntity(newPutovanje);
-        putovanje.setVozilo(vozilo);
-        putovanje.setKompanija(kompanija);
-        putovanje.setPolaziste(polaziste);
-        putovanje.setOdrediste(odrediste);
+        Putovanje putovanje = Putovanje.builder()
+                .polaziste(polaziste)
+                .odrediste(odrediste)
+                .kompanija(kompanija)
+                .vozilo(vozilo)
+                .vremePolaska(newPutovanje.getVremePolaska())
+                .vremeDolaska(newPutovanje.getVremeDolaska())
+                .osnovnaCena(newPutovanje.getOsnovnaCena())
+                .build();
+
         Putovanje saved = putovanjeRepository.save(putovanje);
         return putovanjeMapper.toResponse(saved);
     }

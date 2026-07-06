@@ -42,6 +42,11 @@ public class VoziloController {
         return ResponseEntity.ok(voziloService.getAllVozilaForKompanija(id));
     }
 
+    @GetMapping("/api/vozila")
+    public ResponseEntity<List<VoziloResponseDTO>> getAllVozila() {
+        return ResponseEntity.ok(voziloService.getAllVozila());
+    }
+
     /**
      * Metoda koja kreira novo vozilo na osnovu podataka prosledjenih u VoziloRequestDTO objektu
      *
@@ -52,6 +57,8 @@ public class VoziloController {
     public ResponseEntity<VoziloResponseDTO> createVozilo(@RequestBody VoziloRequestDTO vozilo) {
         return ResponseEntity.status(201).body(voziloService.createVozilo(vozilo));
     }
+
+
 
     /**
      * Metoda koja azurira postojece vozilo na osnovu prosledjenog ID-a i podataka u VoziloRequestDTO objektu

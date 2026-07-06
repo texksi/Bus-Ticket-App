@@ -42,6 +42,13 @@ public class VoziloService {
         return voziloMapper.toResponse(vozilo);
     }
 
+    public List<VoziloResponseDTO> getAllVozila() {
+        return voziloRepository.findAll()
+                .stream()
+                .map(voziloMapper::toResponse)
+                .toList();
+    }
+
     /**
      * Metoda koja pronalazi i vraca listu vozila od kompanije, na osnovu prosledjenog ID-a kompanije, vrsi se provera
      * da li kompanija sa datim ID-om postoji, ako ne postoji baca se custom Exception i prekida rad procesa
