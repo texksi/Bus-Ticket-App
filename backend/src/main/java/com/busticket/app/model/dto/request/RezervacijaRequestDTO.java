@@ -22,5 +22,4 @@ public class RezervacijaRequestDTO {
     private Long korisnikId;
     @Positive(message = "Ukupan iznos mora biti veci od nule")
     private double ukupanIznos;
-    
 }
