@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * Kontroler za upravljanje ocenama
  * Sadrzi REST API endpointe za kreiranje i brisanje ocena.
@@ -38,5 +40,10 @@ public class OcenaController {
     public ResponseEntity<Void> deleteOcena(@PathVariable Long id){
         ocenaService.deleteOcena(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/api/ocene")
+    public ResponseEntity<List<OcenaResponseDTO>> getAllOcene() {
+        return ResponseEntity.ok(ocenaService.getAllOcene());
     }
 }

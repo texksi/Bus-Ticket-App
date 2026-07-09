@@ -91,4 +91,10 @@ public class RezervacijaController {
         rezervacijaService.deleteRezervacija(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/api/rezervacije/{id}/iznos")
+    public ResponseEntity<Void> azurirajIznos(@PathVariable Long id) {
+        rezervacijaService.azurirajUkupanIznos(id);
+        return ResponseEntity.ok().build();
+    }
 }

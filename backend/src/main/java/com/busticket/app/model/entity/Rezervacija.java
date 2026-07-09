@@ -35,8 +35,11 @@ public class Rezervacija {
      * Datum i vreme kreiranja rezervacije
      */
     @Column(name = "datum_kreiranja", nullable = false)
-    @Builder.Default
-    private LocalDateTime datumKreiranja = LocalDateTime.now();
+    private LocalDateTime datumKreiranja;
+    @PrePersist
+    protected void onCreate() {
+        datumKreiranja = LocalDateTime.now();
+    }
     /**
      * Ukupan iznos rezervacije
      */

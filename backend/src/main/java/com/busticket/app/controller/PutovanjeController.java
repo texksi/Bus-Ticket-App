@@ -7,8 +7,11 @@ import com.busticket.app.service.OcenaService;
 import com.busticket.app.service.PutovanjeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.time.LocalDate;
+
 
 import java.util.List;
 
@@ -92,5 +95,12 @@ public class PutovanjeController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/api/putovanja/pretraga")
+    public ResponseEntity<List<PutovanjeResponseDTO>> getPutovanjaByFilter(
+            @RequestParam(required = false) Long polazisteId,
+            @RequestParam(required = false) Long odredisteId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate datum) {
+        return ResponseEntity.ok(putovanjeService.getPutovanjaByFilter(polazisteId, odredisteId, datum));
+    }
 
 }

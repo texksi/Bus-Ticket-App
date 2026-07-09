@@ -17,5 +17,6 @@ public class PlacanjeResponseDTO {
     private LocalDateTime datum;
     private String status;
     private Long rezervacijaId;
+    private String clientSecret;
 
 }

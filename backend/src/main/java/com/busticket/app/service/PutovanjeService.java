@@ -15,6 +15,7 @@ import com.busticket.app.repository.VoziloRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -154,4 +155,13 @@ public class PutovanjeService {
         return putovanja.stream().map(putovanjeMapper::toResponse).toList();
     }
 
+    public List<PutovanjeResponseDTO> getPutovanjaByFilter(Long polazisteId, Long odredisteId, LocalDate datum) {
+        List<Putovanje> sva = putovanjeRepository.findAll();
+        return sva.stream()
+                .filter(p -> polazisteId == null || p.getPolaziste().getId().equals(polazisteId))
+                .filter(p -> odredisteId == null || p.getOdrediste().getId().equals(odredisteId))
+                .filter(p -> datum == null || p.getVremePolaska().toLocalDate().equals(datum))
+                .map(putovanjeMapper::toResponse)
+                .toList();
+    }
 }

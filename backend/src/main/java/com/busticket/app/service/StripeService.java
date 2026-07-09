@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 /**
  * Servis za upravljanje placanjima putem Stripe payment gateway-a.
  * Omogucava kreiranje PaymentIntent-a na Stripe platformi i cuvanje placanja u bazi podataka.
@@ -70,9 +72,12 @@ public class StripeService {
                 .status(paymentIntent.getStatus())
                 .rezervacija(rezervacijaRepository.findById(rezervacijaId)
                         .orElseThrow(() -> new EntityNotFoundException("Rezervacija ne postoji")))
+                .datum(LocalDateTime.now())
                 .build();
         Placanje placanjeSaved = placanjeRepository.save(placanje);
-        return placanjeMapper.toResponse(placanjeSaved);
+        PlacanjeResponseDTO dto = placanjeMapper.toResponse(placanjeSaved);
+        dto.setClientSecret(paymentIntent.getClientSecret()); // dodaj ovo
+        return dto;
     }
 }
 

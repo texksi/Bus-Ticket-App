@@ -14,7 +14,8 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 stripe:
-  secret-key: sk_test_...
+  secret-key: sk_test_51TLQD3GBfe54RqwiWorNLpbEyD0OQYDYF2Fsr0bJvBymfNdfu19Swq01YI7No8BXyWItRYSJxsH5nBA80nMmZFWZ00BZdTC1Hi
+  publishable-key: pk_test_51TLQD3GBfe54Rqwiy9h8fXeqfCuKtraCuak6QVQl2sZQ1rjof3ThSiLgaLtVrpLQr1n9fFyDatsO8rXxcumSfPLC00KCkPK8ds
 springdoc:
   swagger-ui:
     url: /openapi.yaml
