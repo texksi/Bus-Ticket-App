@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
+import RezervacijaModal from "../components/modals/RezervacijaModal";
 import api from "../api/api";
 
 export default function PutovanjaPage() {
@@ -11,6 +12,7 @@ export default function PutovanjaPage() {
   const [gradovi, setGradovi] = useState([]);
   const [putovanja, setPutovanja] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [modalPutovanje, setModalPutovanje] = useState(null);
 
   const [forma, setForma] = useState({
     polazisteId: searchParams.get("polazisteId") || "",
@@ -20,39 +22,44 @@ export default function PutovanjaPage() {
   });
 
   const [filteri, setFilteri] = useState({
-    tipKarte: [],
     maxCena: 5000,
     sortBy: "cena-asc",
   });
 
-  useEffect(() => {
-    api.get("/api/gradovi").then((res) => setGradovi(res.data));
-  }, []);
+ useEffect(() => {
+  api.get("/api/gradovi").then((res) => setGradovi(res.data));
 
-  useEffect(() => {
-    setLoading(true);
-    api.get("/api/putovanja")
-      .then((res) => setPutovanja(res.data))
-      .finally(() => setLoading(false));
-  }, []);
+  setLoading(true);
+  api.get("/api/putovanja/pretraga")
+    .then((res) => setPutovanja(res.data))
+    .finally(() => setLoading(false));
+}, []);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    navigate(`/putovanja?polazisteId=${forma.polazisteId}&odredisteId=${forma.odredisteId}&datum=${forma.datum}&putnici=${forma.putnici}`);
-  };
+const handleSearch = (e) => {
+  e.preventDefault();
+  console.log("forma:", forma);
+  setLoading(true);
+  const params = new URLSearchParams();
+  if (forma.polazisteId) params.append("polazisteId", forma.polazisteId);
+  if (forma.odredisteId) params.append("odredisteId", forma.odredisteId);
+  if (forma.datum) params.append("datum", forma.datum);
 
+  console.log("params:", params.toString());
+
+  api.get(`/api/putovanja/pretraga?${params.toString()}`)
+    .then((res) => {
+      console.log("rezultati:", res.data);
+      setPutovanja(res.data);
+    })
+    .finally(() => setLoading(false));
+};
   const getGradNaziv = (id) => {
-    const grad = gradovi.find((g) => g.id === id);
+    const grad = gradovi.find((g) => g.id === Number(id));
     return grad ? grad.naziv : "";
   };
 
-  const filtriranaPutovanja = putovanja
-    .filter((p) => {
-      if (forma.polazisteId && p.polazisteId !== Number(forma.polazisteId)) return false;
-      if (forma.odredisteId && p.odredisteId !== Number(forma.odredisteId)) return false;
-      if (p.osnovnaCena > filteri.maxCena) return false;
-      return true;
-    })
+  const sortovanaPutovanja = putovanja
+    .filter((p) => p.osnovnaCena <= filteri.maxCena)
     .sort((a, b) => {
       if (filteri.sortBy === "cena-asc") return a.osnovnaCena - b.osnovnaCena;
       if (filteri.sortBy === "cena-desc") return b.osnovnaCena - a.osnovnaCena;
@@ -64,6 +71,15 @@ export default function PutovanjaPage() {
   const formatVreme = (dateStr) => {
     if (!dateStr) return "";
     return new Date(dateStr).toLocaleTimeString("sr-RS", { hour: "2-digit", minute: "2-digit" });
+  };
+
+  const formatDatum = (dateStr) => {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleDateString("sr-RS", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
   };
 
   const formatTrajanje = (polazak, dolazak) => {
@@ -83,7 +99,12 @@ export default function PutovanjaPage() {
         className="px-12 py-8"
         style={{ background: "linear-gradient(135deg, #1a3a8f 0%, #1565c0 100%)" }}
       >
-        <h1 className="text-white text-2xl font-medium mb-1">Pretraga putovanja</h1>
+        <h1 className="text-white text-2xl font-medium">Pretraga putovanja</h1>
+        <p className="text-[#b3cef5] text-sm mt-1">
+          {getGradNaziv(forma.polazisteId)} {forma.polazisteId && "→"} {getGradNaziv(forma.odredisteId)}
+          {forma.datum && ` · ${forma.datum}`}
+          {` · ${forma.putnici} putnik`}
+        </p>
       </div>
 
       {/* SEARCH BAR */}
@@ -140,6 +161,7 @@ export default function PutovanjaPage() {
           </div>
           <button
             type="submit"
+            onClick={handleSearch}
             className="bg-[#1565c0] hover:bg-[#0d47a1] text-white rounded-xl px-6 py-3 text-sm font-medium border-none cursor-pointer transition flex-shrink-0"
           >
             🔍 Pretraži
@@ -148,28 +170,20 @@ export default function PutovanjaPage() {
       </div>
 
       {/* CONTENT */}
-      <div className="grid gap-6 px-12 py-6 max-w-6xl mx-auto" style={{ gridTemplateColumns: "260px 1fr" }}>
-
+      <div
+        className="grid gap-6 px-12 py-6 mx-auto"
+        style={{ gridTemplateColumns: "260px 1fr", maxWidth: "1100px" }}
+      >
         {/* FILTERI */}
         <div className="bg-white rounded-2xl p-6 border border-gray-100 h-fit">
           <div className="flex justify-between items-center mb-5">
             <span className="text-[#1a237e] text-sm font-medium">Filteri</span>
             <span
-              onClick={() => setFilteri({ tipKarte: [], maxCena: 5000, sortBy: "cena-asc" })}
+              onClick={() => setFilteri({ maxCena: 5000, sortBy: "cena-asc" })}
               className="text-gray-400 text-xs cursor-pointer hover:text-[#1565c0]"
             >
-              Resetuj sve
+              Resetuj
             </span>
-          </div>
-
-          <div className="mb-5">
-            <div className="text-gray-600 text-xs font-medium mb-3">Vreme polaska</div>
-            {["Jutro (6h - 12h)", "Popodne (12h - 18h)", "Veče (18h - 24h)"].map((v, i) => (
-              <div key={i} className="flex items-center gap-2 mb-2">
-                <input type="checkbox" className="accent-[#1565c0]" />
-                <label className="text-xs text-gray-500">{v}</label>
-              </div>
-            ))}
           </div>
 
           <div className="mb-5">
@@ -193,7 +207,7 @@ export default function PutovanjaPage() {
         <div>
           <div className="flex justify-between items-center mb-4">
             <span className="text-gray-400 text-sm">
-              Pronađeno <strong className="text-[#1a237e]">{filtriranaPutovanja.length} putovanja</strong>
+              Pronađeno <strong className="text-[#1a237e]">{sortovanaPutovanja.length} putovanja</strong>
             </span>
             <select
               value={filteri.sortBy}
@@ -209,47 +223,43 @@ export default function PutovanjaPage() {
 
           {loading ? (
             <div className="text-center text-gray-400 py-16">Učitavanje...</div>
-          ) : filtriranaPutovanja.length === 0 ? (
+          ) : sortovanaPutovanja.length === 0 ? (
             <div className="text-center text-gray-400 py-16 bg-white rounded-2xl border border-gray-100">
               <div className="text-4xl mb-3">🚌</div>
-              <div className="text-sm">Nema dostupnih putovanja za izabrane parametre.</div>
+              <div className="text-sm">Nema dostupnih putovanja.</div>
             </div>
           ) : (
-            filtriranaPutovanja.map((p) => (
+            sortovanaPutovanja.map((p) => (
               <div
                 key={p.id}
-                className="bg-white rounded-2xl p-5 border border-gray-100 mb-3 grid gap-4 items-center"
-                style={{ gridTemplateColumns: "1fr auto" }}
+                className="bg-white rounded-2xl p-5 border border-gray-100 mb-3 flex justify-between items-center"
               >
                 <div>
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="text-[#1a237e] text-lg font-medium">
-                      {getGradNaziv(p.polazisteId)}
-                    </span>
+                    <span className="text-[#1a237e] text-lg font-medium">{getGradNaziv(p.polazisteId)}</span>
                     <span className="text-[#1565c0]">→</span>
-                    <span className="text-[#1a237e] text-lg font-medium">
-                      {getGradNaziv(p.odredisteId)}
-                    </span>
+                    <span className="text-[#1a237e] text-lg font-medium">{getGradNaziv(p.odredisteId)}</span>
                   </div>
                   <div className="flex gap-6">
                     <div className="flex flex-col gap-0.5">
                       <span className="text-gray-300 text-xs">Polazak</span>
-                      <span className="text-gray-600 text-sm font-medium">{formatVreme(p.vremePolaska)}</span>
+                      <span className="text-gray-600 text-sm font-medium">
+                        {formatDatum(p.vremePolaska)} · {formatVreme(p.vremePolaska)}
+                      </span>
                     </div>
                     <div className="flex flex-col gap-0.5">
                       <span className="text-gray-300 text-xs">Dolazak</span>
-                      <span className="text-gray-600 text-sm font-medium">{formatVreme(p.vremeDolaska)}</span>
+                      <span className="text-gray-600 text-sm font-medium">
+                        {formatDatum(p.vremeDolaska)} · {formatVreme(p.vremeDolaska)}
+                      </span>
                     </div>
                     <div className="flex flex-col gap-0.5">
                       <span className="text-gray-300 text-xs">Trajanje</span>
-                      <span className="text-gray-600 text-sm font-medium">{formatTrajanje(p.vremePolaska, p.vremeDolaska)}</span>
+                      <span className="text-gray-600 text-sm font-medium">
+                        {formatTrajanje(p.vremePolaska, p.vremeDolaska)}
+                      </span>
                     </div>
                   </div>
-                  {p.kompanijaId && (
-                    <span className="inline-block mt-3 bg-[#e8f0fe] text-[#1565c0] text-xs px-3 py-1 rounded-full">
-                      Kompanija #{p.kompanijaId}
-                    </span>
-                  )}
                 </div>
 
                 <div className="flex flex-col items-end gap-3">
@@ -263,7 +273,7 @@ export default function PutovanjaPage() {
                     <span className="text-xs px-2 py-0.5 rounded-full border border-orange-500 text-orange-500 bg-orange-50">VIP</span>
                   </div>
                   <button
-                    onClick={() => navigate(`/putovanje/${p.id}`)}
+                    onClick={() => setModalPutovanje(p)}
                     className="bg-[#ffa726] hover:bg-[#fb8c00] text-white border-none rounded-xl px-5 py-2.5 text-sm font-medium cursor-pointer transition"
                   >
                     Rezerviši →
@@ -274,6 +284,15 @@ export default function PutovanjaPage() {
           )}
         </div>
       </div>
+
+      {/* MODAL */}
+      {modalPutovanje && (
+        <RezervacijaModal
+          putovanje={modalPutovanje}
+          gradovi={gradovi}
+          onClose={() => setModalPutovanje(null)}
+        />
+      )}
 
       <Footer />
     </div>

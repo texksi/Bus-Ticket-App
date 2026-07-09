@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useKorpa } from "../../context/KorpaContext";
 
 function getUserFromToken() {
   const token = localStorage.getItem("token");
@@ -14,6 +15,7 @@ function getUserFromToken() {
 export default function Navbar() {
   const navigate = useNavigate();
   const user = getUserFromToken();
+  const { korpa } = useKorpa();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -30,6 +32,19 @@ export default function Navbar() {
         <Link to="/" className="text-white/80 text-sm no-underline hover:text-[#ffa726] transition">Početna</Link>
         <Link to="/putovanja" className="text-white/80 text-sm no-underline hover:text-[#ffa726] transition">Putovanja</Link>
         <Link to="/o-nama" className="text-white/80 text-sm no-underline hover:text-[#ffa726] transition">O nama</Link>
+       {user && (
+  <Link to="/moje-rezervacije" className="text-white/80 text-sm no-underline hover:text-[#ffa726] transition">
+    Moje rezervacije
+  </Link>
+)}
+       <Link to="/korpa" className="relative text-white/80 text-sm no-underline hover:text-[#ffa726] transition flex items-center gap-1">
+  🛒
+  {korpa.length > 0 && (
+    <span className="bg-[#ffa726] text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
+      {korpa.length}
+    </span>
+  )}
+</Link>
         {user?.role === "ADMIN" && (
   <Link to="/admin" className="text-white/80 text-sm no-underline hover:text-[#ffa726] transition">
     Dashboard
