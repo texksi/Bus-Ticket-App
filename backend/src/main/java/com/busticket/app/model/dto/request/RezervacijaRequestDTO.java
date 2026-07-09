@@ -20,4 +20,6 @@ public class RezervacijaRequestDTO {
     private StatusRezervacije status;
     @NotNull(message = "ID korisnika je obavezan")
     private Long korisnikId;
+    @Positive(message = "Ukupan iznos mora biti veci od nule")
+    private double ukupanIznos;
 }

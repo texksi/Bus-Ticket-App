@@ -13,12 +13,15 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
 stripe:
-  secret-key: sk_test_...
+  secret-key: ${STRIPE_SECRET_KEY}
+  publishable-key: ${STRIPE_PUBLISHABLE_KEY}
+
 springdoc:
   swagger-ui:
     url: /openapi.yaml
 jwt:
-  secret: 35a66503a668ae49294e5401c05ab76fc31928111d92308325323f40f161ffce99
-  audience: bus-ticket-app
-  issuer: bus-ticket-app
+  secret: ${JWT_SECRET}
+  audience: ${JWT_AUDIENCE}
+  issuer: ${JWT_ISSUER}

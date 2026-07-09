@@ -92,6 +92,8 @@ public class OcenaService {
         }
         ocena.setKorisnik(korisnik);
         ocena.setPutovanje(putovanje);
+        ocena.setOcenaVrednost(newOcena.getOcena());
+        ocena.setKomentar(newOcena.getKomentar());
         Ocena saved = ocenaRepository.save(ocena);
         return ocenaMapper.toResponse(saved);
     }
@@ -110,6 +112,11 @@ public class OcenaService {
         );
         ocenaRepository.deleteById(id);
     }
-
-
+    
+    public List<OcenaResponseDTO> getAllOcene() {
+        return ocenaRepository.findAll()
+                .stream()
+                .map(ocenaMapper::toResponse)
+                .toList();
+    }
 }

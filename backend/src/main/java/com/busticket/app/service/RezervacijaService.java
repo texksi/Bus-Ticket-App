@@ -4,6 +4,7 @@ import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.RezervacijaMapper;
 import com.busticket.app.model.dto.request.RezervacijaRequestDTO;
 import com.busticket.app.model.dto.response.RezervacijaResponseDTO;
+import com.busticket.app.model.entity.Karta;
 import com.busticket.app.model.entity.Korisnik;
 import com.busticket.app.model.entity.Rezervacija;
 import com.busticket.app.repository.KorisnikRepository;
@@ -63,11 +64,14 @@ public class RezervacijaService {
      * @throws EntityNotFoundException - ukoliko ne postoji korisnik sa odgovaracujim ID-om za koga se kreira rezervacija
      * baca se custom exception sa porukom "Korisnik ne postoji"
      */
-    public RezervacijaResponseDTO createRezervacija(RezervacijaRequestDTO newRezervacija){
+    public RezervacijaResponseDTO createRezervacija(RezervacijaRequestDTO newRezervacija) {
         Korisnik korisnik = korisnikRepository.findById(newRezervacija.getKorisnikId())
                 .orElseThrow(() -> new EntityNotFoundException("Korisnik ne postoji"));
         Rezervacija rezervacija = rezervacijaMapper.toEntity(newRezervacija);
         rezervacija.setKorisnik(korisnik);
+        rezervacija.setUkupanIznos(newRezervacija.getUkupanIznos());
+        rezervacija.setStatus(newRezervacija.getStatus());
+        rezervacija.setNacinPlacanja(newRezervacija.getNacinPlacanja());
         return rezervacijaMapper.toResponse(rezervacijaRepository.save(rezervacija));
     }
 
@@ -121,5 +125,18 @@ public class RezervacijaService {
         );
         List<Rezervacija> rezervacije = rezervacijaRepository.findAllByKorisnikId(korisnikId);
         return rezervacije.stream().map(rezervacijaMapper::toResponse).toList();
+    }
+
+    public void azurirajUkupanIznos(Long rezervacijaId) {
+        Rezervacija rezervacija = rezervacijaRepository.findById(rezervacijaId)
+                .orElseThrow(() -> new EntityNotFoundException("Rezervacija ne postoji"));
+
+        double stvarniIznos = rezervacija.getKarte()
+                .stream()
+                .mapToDouble(Karta::getFinalnaCena)
+                .sum();
+
+        rezervacija.setUkupanIznos(stvarniIznos);
+        rezervacijaRepository.save(rezervacija);
     }
 }

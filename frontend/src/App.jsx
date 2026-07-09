@@ -14,6 +14,9 @@ import AdminKorisniciPage from "./pages/AdminKorisnici";
 import AdminRezervacijePage from "./pages/AdminRezervacije";
 import AdminOcenePage from "./pages/AdminOcene";
 import AdminPlacanjaPage from "./pages/AdminPlacanja";
+import KorpaPage from "./pages/KorpaPage";
+import MojeRezervacijePage from "./pages/MojeRezervacije";
+import PlacanjePage from "./pages/PlacanjePage";
 
 function ProtectedAdminRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -47,6 +50,9 @@ export default function App() {
         <Route path="/admin/rezervacije" element={<ProtectedAdminRoute><AdminRezervacijePage /></ProtectedAdminRoute>} />
         <Route path="/admin/ocene" element={<ProtectedAdminRoute><AdminOcenePage /></ProtectedAdminRoute>} />
         <Route path="/admin/placanja" element={<ProtectedAdminRoute><AdminPlacanjaPage /></ProtectedAdminRoute>} />
+        <Route path="/korpa" element={<KorpaPage />} />
+        <Route path="/moje-rezervacije" element={<MojeRezervacijePage />} />
+        <Route path="/placanje" element={<PlacanjePage />} />
       </Routes>
     </BrowserRouter>
   );

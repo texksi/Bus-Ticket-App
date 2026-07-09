@@ -56,4 +56,11 @@ public class PlacanjeService {
         List<Placanje> placanjaZaRezervaciju = placanjeRepository.findAllByRezervacijaId(id);
         return placanjaZaRezervaciju.stream().map(placanjeMapper::toResponse).toList();
     }
+
+    public List<PlacanjeResponseDTO> getAllPlacanja(){
+        return placanjeRepository.findAll()
+                .stream()
+                .map(placanjeMapper::toResponse)
+                .toList();
+    }
 }

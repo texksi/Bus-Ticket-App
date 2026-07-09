@@ -12,5 +12,9 @@ public interface RezervacijaMapper {
     @Mapping(source = "korisnik.id", target = "korisnikId")
     RezervacijaResponseDTO toResponse(Rezervacija rezervacija);
 
+    @Mapping(target = "korisnik", ignore = true)
+    @Mapping(target = "karte", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "datumKreiranja", ignore = true)
     Rezervacija toEntity(RezervacijaRequestDTO requestDTO);
 }

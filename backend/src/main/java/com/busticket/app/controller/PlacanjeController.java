@@ -41,4 +41,9 @@ public class PlacanjeController {
     public ResponseEntity<List<PlacanjeResponseDTO>> getPlacanjaForRezervacija(@PathVariable Long id){
         return ResponseEntity.ok(placanjeService.getPlacanjaForRezervacija(id));
     }
+    
+    @GetMapping("api/placanja")
+    public ResponseEntity<List<PlacanjeResponseDTO>> getAllPlacanja(){
+        return ResponseEntity.ok(placanjeService.getAllPlacanja());
+    }
 }
