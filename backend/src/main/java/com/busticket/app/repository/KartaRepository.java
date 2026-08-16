@@ -28,4 +28,6 @@ public interface KartaRepository extends JpaRepository<Karta,Long> {
      * @return List<Karta> - lista karata vezanih za dato putovanje
      */
     List<Karta> findAllByPutovanjeId(Long putovanjeId);
+    boolean existsByPutovanjeId(Long putovanjeId);
+
 }

@@ -7,6 +7,7 @@ import com.busticket.app.model.dto.response.VoziloResponseDTO;
 import com.busticket.app.service.KompanijaService;
 import com.busticket.app.service.PutovanjeService;
 import com.busticket.app.service.VoziloService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -76,7 +77,7 @@ public class KompanijaController {
      * @return ResponseEntity sa KompanijaResponseDTO objektom i HTTP statusom 201
      */
     @PostMapping("/api/kompanije")
-    public ResponseEntity<KompanijaResponseDTO> createKompanija(@RequestBody KompanijaRequestDTO kompanija) {
+    public ResponseEntity<KompanijaResponseDTO> createKompanija(@RequestBody @Valid KompanijaRequestDTO kompanija) {
         return ResponseEntity.status(201).body(kompanijaService.createKompanija(kompanija));
     }
 
@@ -88,7 +89,7 @@ public class KompanijaController {
      * @return ResponseEntity sa KompanijaResponseDTO objektom i HTTP statusom 200
      */
     @PutMapping("/api/kompanije/{id}")
-    public ResponseEntity<KompanijaResponseDTO> updateKompanija(@RequestBody KompanijaRequestDTO kompanija,
+    public ResponseEntity<KompanijaResponseDTO> updateKompanija(@RequestBody @Valid KompanijaRequestDTO kompanija,
                                                                 @PathVariable Long id) {
         return ResponseEntity.ok(kompanijaService.updateKompanija(id, kompanija.getNaziv(), kompanija.getKontakt()));
     }

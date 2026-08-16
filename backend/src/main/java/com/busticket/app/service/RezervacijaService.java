@@ -11,6 +11,7 @@ import com.busticket.app.repository.KorisnikRepository;
 import com.busticket.app.repository.RezervacijaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -127,6 +128,7 @@ public class RezervacijaService {
         return rezervacije.stream().map(rezervacijaMapper::toResponse).toList();
     }
 
+    @Transactional
     public void azurirajUkupanIznos(Long rezervacijaId) {
         Rezervacija rezervacija = rezervacijaRepository.findById(rezervacijaId)
                 .orElseThrow(() -> new EntityNotFoundException("Rezervacija ne postoji"));

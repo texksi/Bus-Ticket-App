@@ -2,6 +2,7 @@ package com.busticket.app.controller;
 
 
 import com.busticket.app.exceptions.EntityAlreadyExistsException;
+import com.busticket.app.exceptions.EntityInUseException;
 import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.exceptions.InvalidCredentialsException;
 import com.busticket.app.model.dto.ErrorResponse;
@@ -74,7 +75,15 @@ public class GlobalExceptionHandler {
         log.error("InvalidCredentialsException {}", invalidCredentialsException, invalidCredentialsException.getCause());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
-    
+
+    @ExceptionHandler(EntityInUseException.class)
+    public ResponseEntity<ErrorResponse> handleEntityInUseException(EntityInUseException entityInUseException){
+        ErrorResponse error = builderErrorResponse(entityInUseException.getMessage(), "ERR_ENTITY_IN_USE",
+                HttpStatus.CONFLICT.value(), LocalDateTime.now());
+        log.error("EntityInUseException {}", entityInUseException, entityInUseException.getCause());
+        return ResponseEntity.status(error.getStatusCode()).body(error);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException runtimeException){
         ErrorResponse error = builderErrorResponse("Internal server error", "ERR_INTERNAL",

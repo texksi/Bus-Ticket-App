@@ -1,5 +1,6 @@
 package com.busticket.app.service;
 
+import com.busticket.app.exceptions.EntityInUseException;
 import com.busticket.app.exceptions.EntityNotFoundException;
 import com.busticket.app.mapper.PutovanjeMapper;
 import com.busticket.app.model.dto.request.PutovanjeRequestDTO;
@@ -8,10 +9,7 @@ import com.busticket.app.model.entity.Grad;
 import com.busticket.app.model.entity.Kompanija;
 import com.busticket.app.model.entity.Putovanje;
 import com.busticket.app.model.entity.Vozilo;
-import com.busticket.app.repository.GradRepository;
-import com.busticket.app.repository.KompanijaRepository;
-import com.busticket.app.repository.PutovanjeRepository;
-import com.busticket.app.repository.VoziloRepository;
+import com.busticket.app.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +31,7 @@ public class PutovanjeService {
     private final VoziloRepository voziloRepository;
     private final KompanijaRepository kompanijaRepository;
     private final GradRepository gradRepository;
+    private final KartaRepository kartaRepository;
     private static final String PUTOVANJE_NOT_FOUND = "Putovanje nije pronadjeno";
 
     /**
@@ -134,6 +133,9 @@ public class PutovanjeService {
         putovanjeRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(PUTOVANJE_NOT_FOUND)
         );
+        if (kartaRepository.existsByPutovanjeId(id)) {
+            throw new EntityInUseException("Putovanje se ne moze obrisati jer ima izdate karte");
+        }
         putovanjeRepository.deleteById(id);
     }
 

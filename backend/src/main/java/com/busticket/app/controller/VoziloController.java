@@ -3,6 +3,7 @@ package com.busticket.app.controller;
 import com.busticket.app.model.dto.request.VoziloRequestDTO;
 import com.busticket.app.model.dto.response.VoziloResponseDTO;
 import com.busticket.app.service.VoziloService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,7 +55,7 @@ public class VoziloController {
      * @return ResponseEntity sa VoziloResponseDTO objektom i HTTP statusom 201
      */
     @PostMapping("/api/vozila")
-    public ResponseEntity<VoziloResponseDTO> createVozilo(@RequestBody VoziloRequestDTO vozilo) {
+    public ResponseEntity<VoziloResponseDTO> createVozilo(@RequestBody @Valid VoziloRequestDTO vozilo) {
         return ResponseEntity.status(201).body(voziloService.createVozilo(vozilo));
     }
 
@@ -68,7 +69,7 @@ public class VoziloController {
      * @return ResponseEntity sa VoziloResponseDTO objektom i HTTP statusom 200
      */
     @PutMapping("/api/vozila/{id}")
-    public ResponseEntity<VoziloResponseDTO> updateVozilo(@RequestBody VoziloRequestDTO vozilo, @PathVariable Long id) {
+    public ResponseEntity<VoziloResponseDTO> updateVozilo(@RequestBody @Valid VoziloRequestDTO vozilo, @PathVariable Long id) {
         return ResponseEntity.ok(voziloService.updateVozilo(id, vozilo.getKapacitet(), vozilo.getRegistracija(),
                 vozilo.getBrojRedova(), vozilo.getBrojKolona()));
     }
