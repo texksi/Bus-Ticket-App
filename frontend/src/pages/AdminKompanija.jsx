@@ -11,6 +11,7 @@ export default function AdminKompanijaPage() {
   const [editKompanija, setEditKompanija] = useState(null);
   const [forma, setForma] = useState({ naziv: "", kontakt: "" });
   const [greska, setGreska] = useState(null);
+  const [poruka, setPoruka] = useState(null);
 
   useEffect(() => {
     api.get("/api/kompanije")
@@ -27,6 +28,7 @@ export default function AdminKompanijaPage() {
       setForma({ naziv: "", kontakt: "" });
     }
     setGreska(null);
+    setPoruka(null);
     setModalOtvoren(true);
   };
 
@@ -39,9 +41,18 @@ export default function AdminKompanijaPage() {
       }
       const res = await api.get("/api/kompanije");
       setKompanije(res.data);
-      setModalOtvoren(false);
+      setPoruka("Sistem je zapamtio kompaniju.");
+      setTimeout(() => {
+        setModalOtvoren(false);
+        setPoruka(null);
+      }, 1500);
     } catch (err) {
-      setGreska(err.response?.data?.message || "Greška pri čuvanju kompanije");
+      const errorCode = err.response?.data?.errorCode;
+      if (errorCode === "ERR_VALIDATION") {
+        setGreska(err.response?.data?.message);
+      } else {
+        setGreska("Sistem ne može da zapamti kompaniju.");
+      }
     }
   };
 
@@ -150,7 +161,7 @@ export default function AdminKompanijaPage() {
                 {editKompanija ? "Izmeni kompaniju" : "Dodaj kompaniju"}
               </h2>
               <button
-                onClick={() => setModalOtvoren(false)}
+                onClick={() => { setModalOtvoren(false); setPoruka(null); }}
                 className="bg-gray-100 border-none rounded-lg w-8 h-8 cursor-pointer text-gray-500 hover:bg-gray-200 transition"
               >
                 ✕
@@ -160,6 +171,12 @@ export default function AdminKompanijaPage() {
             {greska && (
               <div className="bg-red-50 border border-red-200 text-red-600 text-xs rounded-xl px-4 py-3 mb-4">
                 {greska}
+              </div>
+            )}
+
+            {poruka && (
+              <div className="bg-green-50 border border-green-200 text-green-700 text-xs rounded-xl px-4 py-3 mb-4">
+                ✓ {poruka}
               </div>
             )}
 
@@ -188,7 +205,7 @@ export default function AdminKompanijaPage() {
 
             <div className="flex justify-end gap-3 mt-6">
               <button
-                onClick={() => setModalOtvoren(false)}
+                onClick={() => { setModalOtvoren(false); setPoruka(null); }}
                 className="bg-gray-100 text-gray-500 border-none rounded-xl px-5 py-2.5 text-sm cursor-pointer hover:bg-gray-200 transition"
               >
                 Otkaži

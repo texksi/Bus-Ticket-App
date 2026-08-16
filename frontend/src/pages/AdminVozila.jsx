@@ -17,6 +17,7 @@ export default function AdminVozilaPage() {
     kompanijaId: "",
   });
   const [greska, setGreska] = useState(null);
+  const [poruka, setPoruka] = useState(null);
 
   useEffect(() => {
     Promise.all([
@@ -44,6 +45,7 @@ export default function AdminVozilaPage() {
       setForma({ registracija: "", brojRedova: "", brojKolona: "", kompanijaId: "" });
     }
     setGreska(null);
+    setPoruka(null);
     setModalOtvoren(true);
   };
 
@@ -63,9 +65,18 @@ export default function AdminVozilaPage() {
       }
       const res = await api.get("/api/vozila");
       setVozila(res.data);
-      setModalOtvoren(false);
+      setPoruka("Sistem je zapamtio vozilo.");
+      setTimeout(() => {
+        setModalOtvoren(false);
+        setPoruka(null);
+      }, 1500);
     } catch (err) {
-      setGreska(err.response?.data?.message || "Greška pri čuvanju vozila");
+      const errorCode = err.response?.data?.errorCode;
+      if (errorCode === "ERR_VALIDATION" || errorCode === "ERR_ENTITY_EXISTS") {
+        setGreska(err.response?.data?.message);
+      } else {
+        setGreska("Sistem ne može da zapamti vozilo.");
+      }
     }
   };
 
@@ -184,7 +195,7 @@ export default function AdminVozilaPage() {
                 {editVozilo ? "Izmeni vozilo" : "Dodaj vozilo"}
               </h2>
               <button
-                onClick={() => setModalOtvoren(false)}
+                onClick={() => { setModalOtvoren(false); setPoruka(null); }}
                 className="bg-gray-100 border-none rounded-lg w-8 h-8 cursor-pointer text-gray-500 hover:bg-gray-200 transition"
               >
                 ✕
@@ -194,6 +205,12 @@ export default function AdminVozilaPage() {
             {greska && (
               <div className="bg-red-50 border border-red-200 text-red-600 text-xs rounded-xl px-4 py-3 mb-4">
                 {greska}
+              </div>
+            )}
+
+            {poruka && (
+              <div className="bg-green-50 border border-green-200 text-green-700 text-xs rounded-xl px-4 py-3 mb-4">
+                ✓ {poruka}
               </div>
             )}
 
@@ -248,7 +265,7 @@ export default function AdminVozilaPage() {
 
             <div className="flex justify-end gap-3 mt-6">
               <button
-                onClick={() => setModalOtvoren(false)}
+                onClick={() => { setModalOtvoren(false); setPoruka(null); }}
                 className="bg-gray-100 text-gray-500 border-none rounded-xl px-5 py-2.5 text-sm cursor-pointer hover:bg-gray-200 transition"
               >
                 Otkaži

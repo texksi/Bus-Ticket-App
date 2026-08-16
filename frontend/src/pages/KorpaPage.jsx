@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import { useKorpa } from "../context/KorpaContext";
@@ -6,6 +7,7 @@ import api from "../api/api";
 export default function KorpaPage() {
   const navigate = useNavigate();
   const { korpa, ukloniIzKorpe, ocistiKorpu, ukupanIznos } = useKorpa();
+  const [uspesnaRezervacija, setUspesnaRezervacija] = useState(false);
 
   const getTipBadge = (tip) => {
     switch (tip) {
@@ -62,7 +64,10 @@ export default function KorpaPage() {
     }
 
     ocistiKorpu();
-    navigate(`/placanje?rezervacijaId=${prvaRezervacijaId}&iznos=${ukupnoSve}`);
+    setUspesnaRezervacija(true);
+    setTimeout(() => {
+      navigate(`/placanje?rezervacijaId=${prvaRezervacijaId}&iznos=${ukupnoSve}`);
+    }, 2000);
   } catch (err) {
     console.error(err);
     alert("Greška pri kreiranju rezervacije. Pokušajte ponovo.");
@@ -81,7 +86,14 @@ export default function KorpaPage() {
         <p className="text-[#b3cef5] text-sm mt-1">{korpa.length} karata izabrano</p>
       </div>
 
-      {korpa.length === 0 ? (
+      {uspesnaRezervacija ? (
+        <div className="max-w-lg mx-auto mt-16 bg-white rounded-2xl p-12 text-center border border-gray-100">
+          <div className="text-[#1a237e] text-base font-medium mb-2">
+            Sistem je kreirao rezervaciju.
+          </div>
+          <div className="text-gray-400 text-sm">Preusmeravanje na plaćanje...</div>
+        </div>
+      ) : korpa.length === 0 ? (
         <div className="max-w-lg mx-auto mt-16 bg-white rounded-2xl p-12 text-center border border-gray-100">
           <div className="text-5xl mb-4">🛒</div>
           <div className="text-gray-400 text-sm mb-4">Korpa je prazna</div>

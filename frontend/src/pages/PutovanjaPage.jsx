@@ -13,12 +13,12 @@ export default function PutovanjaPage() {
   const [putovanja, setPutovanja] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalPutovanje, setModalPutovanje] = useState(null);
+  const [poruka, setPoruka] = useState(null);
 
   const [forma, setForma] = useState({
     polazisteId: searchParams.get("polazisteId") || "",
     odredisteId: searchParams.get("odredisteId") || "",
     datum: searchParams.get("datum") || "",
-    putnici: searchParams.get("putnici") || 1,
   });
 
   const [filteri, setFilteri] = useState({
@@ -26,33 +26,47 @@ export default function PutovanjaPage() {
     sortBy: "cena-asc",
   });
 
- useEffect(() => {
-  api.get("/api/gradovi").then((res) => setGradovi(res.data));
+  useEffect(() => {
+    api.get("/api/gradovi").then((res) => setGradovi(res.data));
 
-  setLoading(true);
-  api.get("/api/putovanja/pretraga")
-    .then((res) => setPutovanja(res.data))
-    .finally(() => setLoading(false));
-}, []);
+    setLoading(true);
+    api
+      .get("/api/putovanja/pretraga")
+      .then((res) => setPutovanja(res.data))
+      .finally(() => setLoading(false));
+  }, []);
 
-const handleSearch = (e) => {
-  e.preventDefault();
-  console.log("forma:", forma);
-  setLoading(true);
-  const params = new URLSearchParams();
-  if (forma.polazisteId) params.append("polazisteId", forma.polazisteId);
-  if (forma.odredisteId) params.append("odredisteId", forma.odredisteId);
-  if (forma.datum) params.append("datum", forma.datum);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    console.log("forma:", forma);
+    setLoading(true);
+    setPoruka(null);
+    const params = new URLSearchParams();
+    if (forma.polazisteId) params.append("polazisteId", forma.polazisteId);
+    if (forma.odredisteId) params.append("odredisteId", forma.odredisteId);
+    if (forma.datum) params.append("datum", forma.datum);
 
-  console.log("params:", params.toString());
+    console.log("params:", params.toString());
 
-  api.get(`/api/putovanja/pretraga?${params.toString()}`)
-    .then((res) => {
-      console.log("rezultati:", res.data);
-      setPutovanja(res.data);
-    })
-    .finally(() => setLoading(false));
-};
+    api
+      .get(`/api/putovanja/pretraga?${params.toString()}`)
+      .then((res) => {
+        console.log("rezultati:", res.data);
+        setPutovanja(res.data);
+        if (res.data.length > 0) {
+          setPoruka({
+            tip: "uspeh",
+            tekst: "Sistem je nasao putovanja po zadatim kriterijumima.",
+          });
+        } else {
+          setPoruka({
+            tip: "prazno",
+            tekst: "Ne postoje dostupna putovanja za zadate kriterijume.",
+          });
+        }
+      })
+      .finally(() => setLoading(false));
+  };
   const getGradNaziv = (id) => {
     const grad = gradovi.find((g) => g.id === Number(id));
     return grad ? grad.naziv : "";
@@ -63,14 +77,19 @@ const handleSearch = (e) => {
     .sort((a, b) => {
       if (filteri.sortBy === "cena-asc") return a.osnovnaCena - b.osnovnaCena;
       if (filteri.sortBy === "cena-desc") return b.osnovnaCena - a.osnovnaCena;
-      if (filteri.sortBy === "vreme-asc") return new Date(a.vremePolaska) - new Date(b.vremePolaska);
-      if (filteri.sortBy === "vreme-desc") return new Date(b.vremePolaska) - new Date(a.vremePolaska);
+      if (filteri.sortBy === "vreme-asc")
+        return new Date(a.vremePolaska) - new Date(b.vremePolaska);
+      if (filteri.sortBy === "vreme-desc")
+        return new Date(b.vremePolaska) - new Date(a.vremePolaska);
       return 0;
     });
 
   const formatVreme = (dateStr) => {
     if (!dateStr) return "";
-    return new Date(dateStr).toLocaleTimeString("sr-RS", { hour: "2-digit", minute: "2-digit" });
+    return new Date(dateStr).toLocaleTimeString("sr-RS", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const formatDatum = (dateStr) => {
@@ -97,49 +116,68 @@ const handleSearch = (e) => {
       {/* HEADER */}
       <div
         className="px-12 py-8"
-        style={{ background: "linear-gradient(135deg, #1a3a8f 0%, #1565c0 100%)" }}
+        style={{
+          background: "linear-gradient(135deg, #1a3a8f 0%, #1565c0 100%)",
+        }}
       >
         <h1 className="text-white text-2xl font-medium">Pretraga putovanja</h1>
         <p className="text-[#b3cef5] text-sm mt-1">
-          {getGradNaziv(forma.polazisteId)} {forma.polazisteId && "→"} {getGradNaziv(forma.odredisteId)}
+          {getGradNaziv(forma.polazisteId)} {forma.polazisteId && "→"}{" "}
+          {getGradNaziv(forma.odredisteId)}
           {forma.datum && ` · ${forma.datum}`}
-          {` · ${forma.putnici} putnik`}
         </p>
       </div>
 
       {/* SEARCH BAR */}
       <div className="bg-[#1249a0] px-12 pb-5">
-        <form onSubmit={handleSearch} className="bg-white rounded-2xl px-5 py-4 flex gap-3 items-end">
+        <form
+          onSubmit={handleSearch}
+          className="bg-white rounded-2xl px-5 py-4 flex gap-3 items-end"
+        >
           <div className="flex flex-col gap-1 flex-1">
-            <label className="text-xs text-gray-400 font-medium">📍 Polazište</label>
+            <label className="text-xs text-gray-400 font-medium">
+              📍 Polazište
+            </label>
             <select
               value={forma.polazisteId}
-              onChange={(e) => setForma({ ...forma, polazisteId: e.target.value })}
+              onChange={(e) =>
+                setForma({ ...forma, polazisteId: e.target.value })
+              }
               className="border-none text-[#1a237e] text-sm font-medium outline-none bg-transparent cursor-pointer"
             >
               <option value="">Izaberi polazište</option>
               {gradovi.map((g) => (
-                <option key={g.id} value={g.id}>{g.naziv} ({g.skracenica})</option>
+                <option key={g.id} value={g.id}>
+                  {g.naziv} ({g.skracenica})
+                </option>
               ))}
             </select>
           </div>
           <div className="w-px self-stretch bg-gray-100" />
           <div className="flex flex-col gap-1 flex-1">
-            <label className="text-xs text-gray-400 font-medium">📍 Odredište</label>
+            <label className="text-xs text-gray-400 font-medium">
+              📍 Odredište
+            </label>
             <select
               value={forma.odredisteId}
-              onChange={(e) => setForma({ ...forma, odredisteId: e.target.value })}
+              onChange={(e) =>
+                setForma({ ...forma, odredisteId: e.target.value })
+              }
               className="border-none text-[#1a237e] text-sm font-medium outline-none bg-transparent cursor-pointer"
             >
               <option value="">Izaberi odredište</option>
               {gradovi.map((g) => (
-                <option key={g.id} value={g.id}>{g.naziv} ({g.skracenica})</option>
+                <option key={g.id} value={g.id}>
+                  {g.naziv} ({g.skracenica})
+                </option>
               ))}
             </select>
           </div>
           <div className="w-px self-stretch bg-gray-100" />
           <div className="flex flex-col gap-1 flex-1">
-            <label className="text-xs text-gray-400 font-medium">📅 Datum</label>
+            <label className="text-xs text-gray-400 font-medium">
+              📅 Datum
+            </label>
             <input
               type="date"
               value={forma.datum}
@@ -148,17 +186,6 @@ const handleSearch = (e) => {
             />
           </div>
           <div className="w-px self-stretch bg-gray-100" />
-          <div className="flex flex-col gap-1 w-20">
-            <label className="text-xs text-gray-400 font-medium">👥 Putnici</label>
-            <input
-              type="number"
-              min="1"
-              max="10"
-              value={forma.putnici}
-              onChange={(e) => setForma({ ...forma, putnici: e.target.value })}
-              className="border-none text-[#1a237e] text-sm font-medium outline-none bg-transparent w-full"
-            />
-          </div>
           <button
             type="submit"
             onClick={handleSearch}
@@ -187,13 +214,17 @@ const handleSearch = (e) => {
           </div>
 
           <div className="mb-5">
-            <div className="text-gray-600 text-xs font-medium mb-3">Maksimalna cena</div>
+            <div className="text-gray-600 text-xs font-medium mb-3">
+              Maksimalna cena
+            </div>
             <input
               type="range"
               min="0"
               max="5000"
               value={filteri.maxCena}
-              onChange={(e) => setFilteri({ ...filteri, maxCena: Number(e.target.value) })}
+              onChange={(e) =>
+                setFilteri({ ...filteri, maxCena: Number(e.target.value) })
+              }
               className="w-full accent-[#1565c0]"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
@@ -205,13 +236,30 @@ const handleSearch = (e) => {
 
         {/* REZULTATI */}
         <div>
+          {poruka && (
+            <div
+              className={`text-sm rounded-xl px-4 py-3 mb-4 border ${
+                poruka.tip === "uspeh"
+                  ? "bg-green-50 border-green-200 text-green-700"
+                  : "bg-amber-50 border-amber-200 text-amber-700"
+              }`}
+            >
+              {poruka.tekst}
+            </div>
+          )}
+
           <div className="flex justify-between items-center mb-4">
             <span className="text-gray-400 text-sm">
-              Pronađeno <strong className="text-[#1a237e]">{sortovanaPutovanja.length} putovanja</strong>
+              Pronađeno{" "}
+              <strong className="text-[#1a237e]">
+                {sortovanaPutovanja.length} putovanja
+              </strong>
             </span>
             <select
               value={filteri.sortBy}
-              onChange={(e) => setFilteri({ ...filteri, sortBy: e.target.value })}
+              onChange={(e) =>
+                setFilteri({ ...filteri, sortBy: e.target.value })
+              }
               className="border border-gray-200 rounded-lg px-3 py-2 text-xs text-[#1a237e] outline-none cursor-pointer"
             >
               <option value="cena-asc">Sortiraj: Najjeftinije</option>
@@ -226,7 +274,9 @@ const handleSearch = (e) => {
           ) : sortovanaPutovanja.length === 0 ? (
             <div className="text-center text-gray-400 py-16 bg-white rounded-2xl border border-gray-100">
               <div className="text-4xl mb-3">🚌</div>
-              <div className="text-sm">Nema dostupnih putovanja.</div>
+              <div className="text-sm">
+                Ne postoje dostupna putovanja za zadate kriterijume.
+              </div>
             </div>
           ) : (
             sortovanaPutovanja.map((p) => (
@@ -236,21 +286,27 @@ const handleSearch = (e) => {
               >
                 <div>
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="text-[#1a237e] text-lg font-medium">{getGradNaziv(p.polazisteId)}</span>
+                    <span className="text-[#1a237e] text-lg font-medium">
+                      {getGradNaziv(p.polazisteId)}
+                    </span>
                     <span className="text-[#1565c0]">→</span>
-                    <span className="text-[#1a237e] text-lg font-medium">{getGradNaziv(p.odredisteId)}</span>
+                    <span className="text-[#1a237e] text-lg font-medium">
+                      {getGradNaziv(p.odredisteId)}
+                    </span>
                   </div>
                   <div className="flex gap-6">
                     <div className="flex flex-col gap-0.5">
                       <span className="text-gray-300 text-xs">Polazak</span>
                       <span className="text-gray-600 text-sm font-medium">
-                        {formatDatum(p.vremePolaska)} · {formatVreme(p.vremePolaska)}
+                        {formatDatum(p.vremePolaska)} ·{" "}
+                        {formatVreme(p.vremePolaska)}
                       </span>
                     </div>
                     <div className="flex flex-col gap-0.5">
                       <span className="text-gray-300 text-xs">Dolazak</span>
                       <span className="text-gray-600 text-sm font-medium">
-                        {formatDatum(p.vremeDolaska)} · {formatVreme(p.vremeDolaska)}
+                        {formatDatum(p.vremeDolaska)} ·{" "}
+                        {formatVreme(p.vremeDolaska)}
                       </span>
                     </div>
                     <div className="flex flex-col gap-0.5">
@@ -265,12 +321,20 @@ const handleSearch = (e) => {
                 <div className="flex flex-col items-end gap-3">
                   <div className="text-right">
                     <div className="text-gray-300 text-xs">od</div>
-                    <div className="text-[#1a237e] text-2xl font-medium">{p.osnovnaCena} RSD</div>
+                    <div className="text-[#1a237e] text-2xl font-medium">
+                      {p.osnovnaCena} RSD
+                    </div>
                   </div>
                   <div className="flex gap-1.5">
-                    <span className="text-xs px-2 py-0.5 rounded-full border border-[#1565c0] text-[#1565c0] bg-[#e8f0fe]">Standard</span>
-                    <span className="text-xs px-2 py-0.5 rounded-full border border-green-600 text-green-600 bg-green-50">Student</span>
-                    <span className="text-xs px-2 py-0.5 rounded-full border border-orange-500 text-orange-500 bg-orange-50">VIP</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full border border-[#1565c0] text-[#1565c0] bg-[#e8f0fe]">
+                      Standard
+                    </span>
+                    <span className="text-xs px-2 py-0.5 rounded-full border border-green-600 text-green-600 bg-green-50">
+                      Student
+                    </span>
+                    <span className="text-xs px-2 py-0.5 rounded-full border border-orange-500 text-orange-500 bg-orange-50">
+                      VIP
+                    </span>
                   </div>
                   <button
                     onClick={() => setModalPutovanje(p)}

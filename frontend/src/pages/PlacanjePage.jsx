@@ -42,7 +42,13 @@ function PlacanjeForrma({ rezervacijaId, iznos }) {
           },
         },
       );
-      if (paymentIntent.status === "succeeded") {
+
+      if (error) {
+        setGreska(error.message);
+        return;
+      }
+
+      if (paymentIntent?.status === "succeeded") {
         await api.put(`/api/rezervacije/${rezervacijaId}`, {
           status: "ZAVRSENA",
           nacinPlacanja: "ONLINE",
@@ -51,12 +57,6 @@ function PlacanjeForrma({ rezervacijaId, iznos }) {
             JSON.parse(atob(localStorage.getItem("token").split(".")[1])).id,
           ),
         });
-        setUspeh(true);
-        setTimeout(() => navigate("/moje-rezervacije"), 2000);
-      }
-      if (error) {
-        setGreska(error.message);
-      } else if (paymentIntent.status === "succeeded") {
         setUspeh(true);
         setTimeout(() => navigate("/moje-rezervacije"), 2000);
       }
@@ -71,7 +71,6 @@ function PlacanjeForrma({ rezervacijaId, iznos }) {
   if (uspeh) {
     return (
       <div className="text-center py-16">
-        <div className="text-5xl mb-4">✅</div>
         <h2 className="text-[#1a237e] text-xl font-medium mb-2">
           Plaćanje uspešno!
         </h2>

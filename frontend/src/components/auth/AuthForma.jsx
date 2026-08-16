@@ -6,6 +6,8 @@ export default function AuthForma({ mode = "login" }) {
   const navigate = useNavigate();
   const [aktivan, setAktivan] = useState(mode);
   const [error, setError] = useState(null);
+  const [uspesnaRegistracija, setUspesnaRegistracija] = useState(false);
+  const [uspesnaPrijava, setUspesnaPrijava] = useState(false);
   const [forma, setForma] = useState({
     ime: "",
     prezime: "",
@@ -27,9 +29,12 @@ export default function AuthForma({ mode = "login" }) {
         password: forma.password,
       });
       localStorage.setItem("token", res.data.token);
-      navigate("/");
+      setUspesnaPrijava(true);
+      setTimeout(() => navigate("/"), 2000);
     } catch (err) {
-      setError(err.response?.data?.message || "Pogrešno korisničko ime ili lozinka");
+      setError(
+        err.response?.data?.message || "Pogrešno korisničko ime ili lozinka",
+      );
     }
   };
 
@@ -39,7 +44,8 @@ export default function AuthForma({ mode = "login" }) {
     try {
       const res = await api.post("/api/auth/register", forma);
       localStorage.setItem("token", res.data.token);
-      navigate("/");
+      setUspesnaRegistracija(true);
+      setTimeout(() => navigate("/"), 2000);
     } catch (err) {
       setError(err.response?.data?.message || "Greška pri registraciji");
     }
@@ -48,11 +54,12 @@ export default function AuthForma({ mode = "login" }) {
   return (
     <div className="bg-[#1249a0] min-h-screen flex items-center justify-center p-8">
       <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden">
-
         {/* TOP */}
         <div
           className="relative px-8 py-10 overflow-hidden"
-          style={{ background: "linear-gradient(135deg, #1a3a8f 0%, #1565c0 100%)" }}
+          style={{
+            background: "linear-gradient(135deg, #1a3a8f 0%, #1565c0 100%)",
+          }}
         >
           <div className="absolute -right-10 -top-10 w-44 h-44 rounded-full bg-white/5" />
           <div className="absolute right-5 -bottom-16 w-32 h-32 rounded-full bg-white/4" />
@@ -72,7 +79,10 @@ export default function AuthForma({ mode = "login" }) {
         {/* TABS */}
         <div className="flex mx-8 border-b border-gray-100">
           <button
-            onClick={() => { setAktivan("login"); setError(null); }}
+            onClick={() => {
+              setAktivan("login");
+              setError(null);
+            }}
             className={`flex-1 text-center py-3 text-sm border-b-2 transition cursor-pointer bg-transparent border-none ${
               aktivan === "login"
                 ? "text-[#1565c0] border-[#1565c0] font-medium"
@@ -82,7 +92,10 @@ export default function AuthForma({ mode = "login" }) {
             Prijava
           </button>
           <button
-            onClick={() => { setAktivan("register"); setError(null); }}
+            onClick={() => {
+              setAktivan("register");
+              setError(null);
+            }}
             className={`flex-1 text-center py-3 text-sm border-b-2 transition cursor-pointer bg-transparent border-none ${
               aktivan === "register"
                 ? "text-[#1565c0] border-[#1565c0] font-medium"
@@ -101,10 +114,30 @@ export default function AuthForma({ mode = "login" }) {
             </div>
           )}
 
-          {aktivan === "login" ? (
+          {aktivan === "login" && uspesnaPrijava ? (
+            <div className="flex flex-col items-center text-center py-6">
+              <p className="text-[#1a237e] text-base font-medium m-0">
+                Korisničko ime i lozinka su ispravni.
+              </p>
+              <p className="text-gray-400 text-xs mt-2">
+                Preusmeravanje na početnu stranicu...
+              </p>
+            </div>
+          ) : aktivan === "register" && uspesnaRegistracija ? (
+            <div className="flex flex-col items-center text-center py-6">
+              <p className="text-[#1a237e] text-base font-medium m-0">
+                Uspesna registracija na sistem.
+              </p>
+              <p className="text-gray-400 text-xs mt-2">
+                Preusmeravanje na početnu stranicu...
+              </p>
+            </div>
+          ) : aktivan === "login" ? (
             <form onSubmit={handleLogin} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-gray-500 font-medium">Korisničko ime</label>
+                <label className="text-xs text-gray-500 font-medium">
+                  Korisničko ime
+                </label>
                 <input
                   type="text"
                   name="username"
@@ -115,7 +148,9 @@ export default function AuthForma({ mode = "login" }) {
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-gray-500 font-medium">Lozinka</label>
+                <label className="text-xs text-gray-500 font-medium">
+                  Lozinka
+                </label>
                 <input
                   type="password"
                   name="password"
@@ -145,7 +180,9 @@ export default function AuthForma({ mode = "login" }) {
             <form onSubmit={handleRegister} className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
-                  <label className="text-xs text-gray-500 font-medium">Ime</label>
+                  <label className="text-xs text-gray-500 font-medium">
+                    Ime
+                  </label>
                   <input
                     type="text"
                     name="ime"
@@ -156,7 +193,9 @@ export default function AuthForma({ mode = "login" }) {
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-xs text-gray-500 font-medium">Prezime</label>
+                  <label className="text-xs text-gray-500 font-medium">
+                    Prezime
+                  </label>
                   <input
                     type="text"
                     name="prezime"
@@ -168,7 +207,9 @@ export default function AuthForma({ mode = "login" }) {
                 </div>
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-gray-500 font-medium">Email</label>
+                <label className="text-xs text-gray-500 font-medium">
+                  Email
+                </label>
                 <input
                   type="email"
                   name="email"
@@ -179,7 +220,9 @@ export default function AuthForma({ mode = "login" }) {
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-gray-500 font-medium">Korisničko ime</label>
+                <label className="text-xs text-gray-500 font-medium">
+                  Korisničko ime
+                </label>
                 <input
                   type="text"
                   name="username"
@@ -190,7 +233,9 @@ export default function AuthForma({ mode = "login" }) {
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-gray-500 font-medium">Lozinka</label>
+                <label className="text-xs text-gray-500 font-medium">
+                  Lozinka
+                </label>
                 <input
                   type="password"
                   name="password"

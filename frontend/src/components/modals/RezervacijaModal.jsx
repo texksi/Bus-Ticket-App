@@ -17,6 +17,8 @@ export default function RezervacijaModal({ putovanje, gradovi, onClose }) {
   const [vozilo, setVozilo] = useState(null);
   const [odabraniTip, setOdabraniTip] = useState("STANDARD");
   const [loading, setLoading] = useState(true);
+  const [poruka, setPoruka] = useState(null);
+  const [greska, setGreska] = useState(false);
 
   const getGradNaziv = (id) =>
     gradovi.find((g) => g.id === Number(id))?.naziv || "";
@@ -223,6 +225,19 @@ export default function RezervacijaModal({ putovanje, gradovi, onClose }) {
             </div>
           )}
 
+          {poruka && (
+            <div
+              className={`text-sm rounded-xl px-4 py-3 mb-4 border ${
+                greska
+                  ? "bg-red-50 border-red-200 text-red-600"
+                  : "bg-green-50 border-green-200 text-green-700"
+              }`}
+            >
+              {greska ? "⚠ " : "✓ "}
+              {poruka}
+            </div>
+          )}
+
           {/* FOOTER */}
           <div className="flex justify-between items-center mt-5 pt-4 border-t border-gray-100">
             <div className="text-sm text-gray-500">
@@ -233,7 +248,19 @@ export default function RezervacijaModal({ putovanje, gradovi, onClose }) {
               </strong>
             </div>
             <button
-              onClick={onClose}
+              onClick={() => {
+                const izabranaSedista = korpa.filter(
+                  (k) => k.putovanjeId === putovanje.id,
+                ).length;
+                if (izabranaSedista === 0) {
+                  setGreska(true);
+                  setPoruka("Morate izabrati sedište pre dodavanja karte u korpu.");
+                  return;
+                }
+                setGreska(false);
+                setPoruka("Karta je dodata u korpu.");
+                setTimeout(onClose, 1200);
+              }}
               className="bg-[#ffa726] hover:bg-[#fb8c00] text-white border-none rounded-xl px-6 py-2.5 text-sm font-medium cursor-pointer transition"
             >
               Dodaj u korpu →

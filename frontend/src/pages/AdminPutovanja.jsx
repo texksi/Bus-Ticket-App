@@ -12,6 +12,8 @@ export default function AdminPutovanjaPage() {
   const [pretraga, setPretraga] = useState("");
   const [modalOtvoren, setModalOtvoren] = useState(false);
   const [editPutovanje, setEditPutovanje] = useState(null);
+  const [poruka, setPoruka] = useState(null);
+  const [porukaLista, setPorukaLista] = useState(null);
   const [forma, setForma] = useState({
     polazisteId: "",
     odredisteId: "",
@@ -101,9 +103,14 @@ export default function AdminPutovanjaPage() {
       }
       const res = await api.get("/api/putovanja");
       setPutovanja(res.data);
-      setModalOtvoren(false);
+      setPoruka({ tip: "uspeh", tekst: "Sistem je zapamtio putovanje." });
+      setTimeout(() => {
+        setModalOtvoren(false);
+        setPoruka(null);
+      }, 1500);
     } catch (err) {
       console.error(err);
+      setPoruka({ tip: "greska", tekst: "Sistem nije uspeo da sačuva putovanje." });
     }
   };
 
@@ -112,8 +119,16 @@ export default function AdminPutovanjaPage() {
     try {
       await api.delete(`/api/putovanja/${id}`);
       setPutovanja(putovanja.filter((p) => p.id !== id));
+      setPorukaLista({ tip: "uspeh", tekst: "Putovanje je obrisano." });
     } catch (err) {
       console.error(err);
+      const tekst =
+        err.response?.data?.errorCode === "ERR_ENTITY_IN_USE"
+          ? "Putovanje se ne može obrisati jer ima izdate karte."
+          : "Sistem ne može da obriše putovanje.";
+      setPorukaLista({ tip: "greska", tekst });
+    } finally {
+      setTimeout(() => setPorukaLista(null), 3000);
     }
   };
 
@@ -143,6 +158,19 @@ export default function AdminPutovanjaPage() {
               + Dodaj putovanje
             </button>
           </div>
+
+          {porukaLista && (
+            <div
+              className={`text-sm rounded-xl px-4 py-3 mb-4 border ${
+                porukaLista.tip === "uspeh"
+                  ? "bg-green-50 border-green-200 text-green-700"
+                  : "bg-red-50 border-red-200 text-red-600"
+              }`}
+            >
+              {porukaLista.tip === "uspeh" ? "✓ " : "⚠ "}
+              {porukaLista.tekst}
+            </div>
+          )}
 
           <div className="flex gap-3 mb-4">
             <input
@@ -306,9 +334,22 @@ export default function AdminPutovanjaPage() {
               </div>
             </div>
 
+            {poruka && (
+              <div
+                className={`text-sm rounded-xl px-4 py-3 mt-5 border ${
+                  poruka.tip === "uspeh"
+                    ? "bg-green-50 border-green-200 text-green-700"
+                    : "bg-red-50 border-red-200 text-red-600"
+                }`}
+              >
+                {poruka.tip === "uspeh" ? "✓ " : "⚠ "}
+                {poruka.tekst}
+              </div>
+            )}
+
             <div className="flex justify-end gap-3 mt-6">
               <button
-                onClick={() => setModalOtvoren(false)}
+                onClick={() => { setModalOtvoren(false); setPoruka(null); }}
                 className="bg-gray-100 text-gray-500 border-none rounded-xl px-5 py-2.5 text-sm cursor-pointer hover:bg-gray-200 transition"
               >
                 Otkaži

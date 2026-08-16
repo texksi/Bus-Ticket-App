@@ -14,6 +14,7 @@ export default function MojeRezervacijePage() {
   const [ocenaModal, setOcenaModal] = useState(null);
   const [ocenaForma, setOcenaForma] = useState({ ocena: 5, komentar: "" });
   const [ocenjenaRezervacija, setOcenjenaRezervacija] = useState([]);
+  const [ocenaPoruka, setOcenaPoruka] = useState(null);
 
   const getUserId = () => {
     const token = localStorage.getItem("token");
@@ -34,6 +35,19 @@ export default function MojeRezervacijePage() {
     );
     const sveKarte = kartePoRez.flatMap((r) => r.data);
     setKarte(sveKarte);
+
+    const oceneRes = await api.get(`/api/korisnici/${korisnikId}/ocene`);
+    const ocenjenaPutovanja = oceneRes.data.map((o) => o.putovanjeId);
+
+    const ocenjeneRezIds = res.data
+      .filter((rez) => {
+        const karteRez = sveKarte.filter((k) => k.rezervacijaId === rez.id);
+        const putovanjeId = karteRez.length > 0 ? karteRez[0].putovanjeId : null;
+        return putovanjeId !== null && ocenjenaPutovanja.includes(putovanjeId);
+      })
+      .map((rez) => rez.id);
+
+    setOcenjenaRezervacija(ocenjeneRezIds);
   };
 
   useEffect(() => {
@@ -133,8 +147,12 @@ export default function MojeRezervacijePage() {
       setOcenjenaRezervacija([...ocenjenaRezervacija, ocenaModal.id]);
       setOcenaModal(null);
       setOcenaForma({ ocena: 5, komentar: "" });
+      setOcenaPoruka({ tip: "uspeh", tekst: "Sistem je zapamtio ocenu." });
     } catch (err) {
       console.error(err);
+      setOcenaPoruka({ tip: "greska", tekst: "Ocena nije uspešno sačuvana. Pokušajte ponovo." });
+    } finally {
+      setTimeout(() => setOcenaPoruka(null), 20000);
     }
   };
 
@@ -149,6 +167,19 @@ export default function MojeRezervacijePage() {
         <h1 className="text-white text-2xl font-medium">Moje rezervacije</h1>
         <p className="text-[#b3cef5] text-sm mt-1">Pregled svih vaših rezervacija</p>
       </div>
+
+      {ocenaPoruka && (
+        <div
+          className={`fixed top-5 left-1/2 -translate-x-1/2 z-[60] text-sm rounded-xl px-5 py-3 border shadow-lg ${
+            ocenaPoruka.tip === "uspeh"
+              ? "bg-green-50 border-green-200 text-green-700"
+              : "bg-red-50 border-red-200 text-red-600"
+          }`}
+        >
+          {ocenaPoruka.tip === "uspeh" ? "✓ " : "⚠ "}
+          {ocenaPoruka.tekst}
+        </div>
+      )}
 
       <div className="max-w-3xl mx-auto px-6 py-6">
         {loading ? (
@@ -199,7 +230,7 @@ export default function MojeRezervacijePage() {
                         ⭐ Oceni
                       </button>
                     )}
-                    {vecOcenjena && (
+                    {r.status === "ZAVRSENA" && vecOcenjena && (
                       <span className="text-yellow-500 text-xs">⭐ Ocenjeno</span>
                     )}
                   </div>
